@@ -6,9 +6,9 @@ To install the package:
 devtools::install_github("junyzhou10/ClusterLong")
 
 ## Usage
-Use main function LongDataCluster(x, Y, id, ...) to cluster longitudinal data in long format. Parallel computing is supported by specifying parallel = TRUE. 
+Use main function **LongDataCluster(x, Y, id, ...)** to cluster longitudinal data in long format. Parallel computing is supported by specifying parallel = TRUE. 
 
-\bold{DendroPlot(Cluster.object)} yields corresponding dendrogram, where Cluster.object is the output from LongDataCluster()
+**DendroPlot(Cluster.object)** yields corresponding dendrogram, where Cluster.object is the output from LongDataCluster()
 
-MeanPlot(Cluster.object) yields corresponding mean curves of each detected cluster.
+**MeanPlot(Cluster.object)** yields corresponding mean curves of each detected cluster.
 
