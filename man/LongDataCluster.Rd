@@ -54,10 +54,10 @@ By specifying part.size and dropout, the algorithm actually split data into mult
 Then combine the output clusters together. If the remaining number of clusters is still larger than part.size, multiple rounds of parallel computing will be implemented.
 }
 \examples{
-\dontrun{
 output = LongDataCluster(Longdat$Dat$obs,
 Longdat$Dat[,paste("y", seq(5), sep = "_")], Longdat$Dat$id)
 # parallel version
+\dontrun{
 require(doMC)
 registerDoMC(cores = 6)
 output = LongDataCluster(Longdat2$Dat$obs,

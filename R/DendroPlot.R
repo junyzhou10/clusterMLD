@@ -5,12 +5,12 @@
 #' @param CH If TRUE, iuse optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gapb
 #' @param plain If TRUE, the dendrogram only, without coloring the clustering results
 #' @param ... Additional arguments for plot
-#' @examples \dontrun{
+#' @examples
 #' output = LongDataCluster(Longdat$Dat$obs,
 #' Longdat$Dat[,paste("y", seq(5), sep = "_")],
 #' Longdat$Dat$id)
 #' DendroPlot(output)
-#' }
+#'
 #' @export
 
 

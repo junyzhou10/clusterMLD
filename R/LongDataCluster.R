@@ -20,10 +20,11 @@
 #' \item{No.CH}{Number of clusters determined by CH index}
 #' @import splines foreach
 #' @importFrom MASS ginv
-#' @examples \dontrun{
+#' @examples
 #' output = LongDataCluster(Longdat$Dat$obs,
 #' Longdat$Dat[,paste("y", seq(5), sep = "_")], Longdat$Dat$id)
 #' # parallel version
+#' \dontrun{
 #' require(doMC)
 #' registerDoMC(cores = 6)
 #' output = LongDataCluster(Longdat2$Dat$obs,
@@ -34,10 +35,10 @@
 #'
 
 LongDataCluster <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "standardize", parallel = FALSE, dropout = 20, part.size = 300, ...){
+  id.list = unique(id)
   if (parallel) {
     splits = floor(length(unique(id))/part.size)
     # randomly split data into subgroups
-    id.list = unique(id)
     id.split = sample(rep(seq(splits), length.out = length(id.list)))
     pure.leaves = foreach(ii = seq(splits), .combine = c) %dopar% {
       grpID = id.list[id.split==ii]

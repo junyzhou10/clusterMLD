@@ -47,12 +47,11 @@ Plot estimated mean trajectories for each detect cluster
 }}
 
 \examples{
-\dontrun{
 output = LongDataCluster(Longdat$Dat$obs,
 Longdat$Dat[,paste("y", seq(5), sep = "_")],
 Longdat$Dat$id)
 DendroPlot(output)
-}
+
 \dontrun{
 require(doMC)
 registerDoMC(cores = 6)
