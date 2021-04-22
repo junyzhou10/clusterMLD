@@ -1,5 +1,5 @@
-#' @title Plot estimated mean trajectories for each detect cluster
-#' @describeIn Based on output from LongDataCluster, yield the corresponding mean curves
+#' @title Plot estimated mean trajectories for each detected cluster
+#' @description Based on output from LongDataCluster, yield the corresponding mean curves
 #' @param Cluster.object The object return from function LongDataCluster
 #' @param No.Cluster User specified number of clusters
 #' @param CH If TRUE, iuse optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gapb
