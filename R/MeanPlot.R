@@ -49,7 +49,7 @@ MeanPlot <- function(Cluster.object, No.Cluster = NULL, CH = FALSE, add.sample =
   # plot
   set.seed(seed)
   no.obs = dim(Cluster.object$calls$x.bs)[1]
-  cluster.ID = Cluster.object$out.ID[[NoCl]]
+  cluster.ID = Cluster.object$Cluster.Lists[[NoCl]]
   x.bs = Cluster.object$calls$x.bs
   id.seq  = Cluster.object$calls$id
   Y.dat = Cluster.object$calls$Y.dat

@@ -13,9 +13,9 @@
 #' @details For relatively large sample size, i.e. the number of subjects, not observations, we suggest to apply parallel computing to save time.
 #' By specifying part.size and dropout, the algorithm actually split data into multiple random partitions with size roughly equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to dropout.
 #' Then combine the output clusters together. If the remaining number of clusters is still larger than part.size, multiple rounds of parallel computing will be implemented.
-#' @return A list object containing the hierarchical clustering results, and some ancillary outputs for parallel computing. The optimal number of clusters will not be determined by this function
+#' @return A list object containing the hierarchical clustering results, and some ancillary outputs for parallel computing.
 #' \item{Cluster.res}{A list with length equal to the number of clusters determined by Gap_b index. Each list element consists of the corresponding subjects' id. In particular, it is equivalent to out.ID[[No.Gapb]]}
-#' \item{out.ID}{List of hierarchical results where the length should be the number of subjects when parallel = FALSE. This is the main output. The rest elements in returns are used to facilitate other functions}
+#' \item{Cluster.Lists}{List of hierarchical results where the length should be the number of subjects when parallel = FALSE. This is the main output. The rest elements in returns are used to facilitate other functions}
 #' \item{No.Gapb}{Number of clusters determined by Gap_b statistic}
 #' \item{No.CH}{Number of clusters determined by CH index}
 #' @import splines foreach
@@ -87,7 +87,7 @@ LongDataCluster <- function(x, Y, id, functional = "bs", preprocess = TRUE, weig
   N.cluster = ifelse(sum(diff(Gap_b)<0)==0, 1, which(diff(Gap_b)<0)[1])
   CH.index  = res$B.dist/(seq(1,length(res$B.dist)))/res$W.dist*(length(id.list) - seq(1,length(res$B.dist))); CH.index[1] = 0
   return(list(Cluster.res = lapply(res$out.ID[[N.cluster]], sort),
-              out.ID = res$out.ID,
+              Cluster.Lists = res$out.ID,
               No.Gapb= N.cluster,
               No.CH  = which.max(CH.index),
               Gap_b  = Gap_b,

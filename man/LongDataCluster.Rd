@@ -39,9 +39,9 @@ LongDataCluster(
 \item{...}{Additional arguments for the functional bases. The default is cubic B-spline with 3 interval knots}
 }
 \value{
-A list object containing the hierarchical clustering results, and some ancillary outputs for parallel computing. The optimal number of clusters will not be determined by this function
+A list object containing the hierarchical clustering results, and some ancillary outputs for parallel computing.
 \item{Cluster.res}{A list with length equal to the number of clusters determined by Gap_b index. Each list element consists of the corresponding subjects' id. In particular, it is equivalent to out.ID[[No.Gapb]]}
-\item{out.ID}{List of hierarchical results where the length should be the number of subjects when parallel = FALSE. This is the main output. The rest elements in returns are used to facilitate other functions}
+\item{Cluster.Lists}{List of hierarchical results where the length should be the number of subjects when parallel = FALSE. This is the main output. The rest elements in returns are used to facilitate other functions}
 \item{No.Gapb}{Number of clusters determined by Gap_b statistic}
 \item{No.CH}{Number of clusters determined by CH index}
 }
