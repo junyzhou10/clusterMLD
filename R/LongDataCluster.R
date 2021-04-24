@@ -49,11 +49,11 @@ LongDataCluster <- function(x, Y, id, functional = "bs", preprocess = TRUE, weig
     # iteratively apply parallel computing idea
     while (TRUE) {
       len = length(pure.leaves)
-      if (len <= part.size) {
+      if (len <= part.size*1.4) {
         break
       }
       # recalculate how many partitions required
-      splits = round(len/part.size)
+      splits = ceiling(len/part.size)
       id.split = sample(rep(seq(splits), length.out = len))
       pure.leaves = foreach(ii = seq(splits), .combine = c) %dopar% {
         output = FinalCluster(pure.leaf = pure.leaves[id.split == ii], dropout = dropout, weight.func = weight.func)
