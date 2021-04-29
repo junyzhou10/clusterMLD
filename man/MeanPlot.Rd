@@ -4,15 +4,7 @@
 \alias{MeanPlot}
 \title{Plot estimated mean trajectories for each detected cluster}
 \usage{
-MeanPlot(
-  Cluster.object,
-  No.Cluster = NULL,
-  CH = FALSE,
-  add.sample = 0,
-  trsp = 0.5,
-  seed = 123,
-  ...
-)
+MeanPlot(Cluster.object, No.Cluster = NULL, CH = FALSE)
 }
 \arguments{
 \item{Cluster.object}{The object return from function LongDataCluster}
@@ -20,14 +12,9 @@ MeanPlot(
 \item{No.Cluster}{User specified number of clusters}
 
 \item{CH}{If TRUE, iuse optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gapb}
-
-\item{add.sample}{The number of samples plot addtionally. Default is 0 means only plot mean trajectories}
-
-\item{trsp}{Transparent coefficient when plotting samples}
-
-\item{seed}{Seed to draw samples from the data}
-
-\item{...}{Additional arguments for plot}
+}
+\value{
+A figure yield by plotly, which mean trajectories in different colors.
 }
 \description{
 Based on output from LongDataCluster, yield the corresponding mean curves
@@ -39,6 +26,6 @@ registerDoMC(cores = 6)
 output = LongDataCluster(Longdat2$Dat$obs,
 Longdat2$Dat[,paste("y", seq(5), sep = "_")],
 Longdat2$Dat$id, parallel = T, dropout = 15, part.size = 200)
-MeanPlot(output, add.sample = 5)
+MeanPlot(output)
 }
 }

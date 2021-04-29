@@ -10,7 +10,7 @@ Description: This package is designed to cluster longitudinal data, especially f
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
-Imports: methods, splines, MASS, dplyr, utils, grDevices, graphics, foreach
+Imports: stats, methods, splines, MASS, dplyr, utils, foreach, ggplot2, plotly
 Suggests:
     roxygen2,
     knitr
