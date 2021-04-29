@@ -11,7 +11,7 @@ MeanPlot(Cluster.object, No.Cluster = NULL, CH = FALSE)
 
 \item{No.Cluster}{User specified number of clusters}
 
-\item{CH}{If TRUE, iuse optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gapb}
+\item{CH}{If TRUE, use optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gap.b}
 }
 \value{
 A figure yield by plotly, which mean trajectories in different colors.

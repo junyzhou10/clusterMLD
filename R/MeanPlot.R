@@ -2,7 +2,7 @@
 #' @description Based on output from LongDataCluster, yield the corresponding mean curves
 #' @param Cluster.object The object return from function LongDataCluster
 #' @param No.Cluster User specified number of clusters
-#' @param CH If TRUE, iuse optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gapb
+#' @param CH If TRUE, use optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gap.b
 #' @return A figure yield by plotly, which mean trajectories in different colors.
 #' @import dplyr ggplot2
 #' @importFrom stats reshape
