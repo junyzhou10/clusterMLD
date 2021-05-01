@@ -3,7 +3,9 @@ Support to clustering longitudinal data with sparse (very little observed points
 
 ## Installation
 To install the package: 
+```r
 devtools::install_github("junyzhou10/ClusterLong")
+```
 
 ## Usage
 Use main function **LongDataCluster(x, Y, id, ...)** to cluster longitudinal data in long format. Parallel computing is supported by specifying parallel = TRUE. 
