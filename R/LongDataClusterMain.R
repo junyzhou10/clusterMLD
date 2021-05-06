@@ -25,14 +25,14 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
   args <- list(...)
   if (!"df" %in% names(args)) {
     if (functional == "bs") {
-      x.bs = bs( x, df = 7, degree = 3, intercept = T, ...)
+      x.bs = bs( x, df = 7, intercept = T, ...)
     } else if (functional == "ns") {
       x.bs = ns( x, df = 7, intercept = T, ...)
     }
 
   } else {
     if (functional == "bs") {
-      x.bs = bs( x, degree = 3, intercept = T, ...)
+      x.bs = bs( x, intercept = T, ...)
     } else if (functional == "ns") {
       x.bs = ns( x, intercept = T, ...)
     }
