@@ -16,7 +16,7 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
   if (weight.func == "standardize") {
     w.func <- function(w) {w/sum(w)}
   } else if (weight.func == "softmax") {
-    w.func <- function(w) {w = scale(w, center = F); exp(w)/sum(exp(w))}
+    w.func <- function(w) {w = scale(w); exp(w)/sum(exp(w))}
   } else {
     warning("weight.func is not correctly specified!")
     return(NULL)
