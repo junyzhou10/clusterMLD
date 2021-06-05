@@ -12,7 +12,7 @@ LongDataCluster(
   preprocess = TRUE,
   weight.func = "standardize",
   parallel = FALSE,
-  dropout = 20,
+  stop = 20,
   part.size = 300,
   ...
 )
@@ -32,7 +32,7 @@ LongDataCluster(
 
 \item{parallel}{If TRUE, use parallel foreach to cluster each ubgroup of original data. Must register parallel before hand, such as doMC or others}
 
-\item{dropout}{An integer, only required in parallel computing. It indicates when to dropout hierarchical clustering process in each slave/serve. See details}
+\item{stop}{An integer, only required in parallel computing. It indicates when to stop hierarchical clustering process in each slave/serve. See details}
 
 \item{part.size}{In parallel computing, the (rough) number of subjects in each random partitions. See more in details}
 
@@ -50,7 +50,7 @@ Clustering longitudinal data, expecially tailored for those observational longit
 }
 \details{
 For relatively large sample size, i.e. the number of subjects, not observations, we suggest to apply parallel computing to save time.
-By specifying part.size and dropout, the algorithm actually split data into multiple random partitions with size roughly equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to dropout.
+By specifying part.size and stop, the algorithm actually split data into multiple random partitions with size roughly equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to stop.
 Then combine the output clusters together. If the remaining number of clusters is still larger than part.size, multiple rounds of parallel computing will be implemented.
 }
 \examples{
@@ -62,6 +62,6 @@ require(doMC)
 registerDoMC(cores = 6)
 output = LongDataCluster(Longdat2$Dat$obs,
 Longdat2$Dat[,paste("y", seq(5), sep = "_")],
-Longdat2$Dat$id, parallel = T, dropout = 15, part.size = 200)
+Longdat2$Dat$id, parallel = T, stop = 15, part.size = 200)
 }
 }

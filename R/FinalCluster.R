@@ -1,11 +1,11 @@
 #' @title Ancillary function for parallel computing
 #' @description Based on outputs from each server/slave, merge them and keep hierarchical algorithm until only one group left
 #' @param pure.leaf Output from LongDataCluster.core in each server
-#' @param dropout When iteratively applying parallel idea, the drop out when a certain number of clusters are left
+#' @param stop When iteratively applying parallel idea, stop when a certain number of clusters are left
 #' @param weight.func weight function
 #' @return The same output as LongDataCluster.core
 
-FinalCluster <- function(pure.leaf, dropout = 1, weight.func) {
+FinalCluster <- function(pure.leaf, stop = 1, weight.func) {
   # define weight function
   if (weight.func == "standardize") {
     w.func <- function(w) {w/sum(w)}
@@ -129,7 +129,7 @@ FinalCluster <- function(pure.leaf, dropout = 1, weight.func) {
       Dist.tab = rbind(Dist.tab, rep(Inf, dim(Dist.tab)[2]))
     }
 
-    if (n.tmp <= dropout) {
+    if (n.tmp <= stop) {
       break
     }
   }

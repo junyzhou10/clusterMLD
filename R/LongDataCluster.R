@@ -7,11 +7,11 @@
 #' @param preprocess boolean, whether data pre-processing procedure should be applied. Default is TRUE to handle subjects with observations less than number of parameters. If set to FALSE, those subjects will be excluded
 #' @param weight.func A string from c("standardize", "softmax"), a method to handle weights across multiple outcomes. Default is "standardize", but "softmax" is recommended for cases with a lot noise (indistinguishable) outcomes
 #' @param parallel If TRUE, use parallel foreach to cluster each ubgroup of original data. Must register parallel before hand, such as doMC or others
-#' @param dropout An integer, only required in parallel computing. It indicates when to dropout hierarchical clustering process in each slave/serve. See details
+#' @param stop An integer, only required in parallel computing. It indicates when to stop hierarchical clustering process in each slave/serve. See details
 #' @param part.size In parallel computing, the (rough) number of subjects in each random partitions. See more in details
 #' @param ... Additional arguments for the functional bases. The default is cubic B-spline with 3 interval knots
 #' @details For relatively large sample size, i.e. the number of subjects, not observations, we suggest to apply parallel computing to save time.
-#' By specifying part.size and dropout, the algorithm actually split data into multiple random partitions with size roughly equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to dropout.
+#' By specifying part.size and stop, the algorithm actually split data into multiple random partitions with size roughly equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to stop.
 #' Then combine the output clusters together. If the remaining number of clusters is still larger than part.size, multiple rounds of parallel computing will be implemented.
 #' @return A list object containing the hierarchical clustering results, and some ancillary outputs for parallel computing.
 #' \item{Cluster.res}{A list with length equal to the number of clusters determined by Gap_b index. Each list element consists of the corresponding subjects' id. In particular, it is equivalent to out.ID[[No.Gapb]]}
@@ -29,12 +29,12 @@
 #' registerDoMC(cores = 6)
 #' output = LongDataCluster(Longdat2$Dat$obs,
 #' Longdat2$Dat[,paste("y", seq(5), sep = "_")],
-#' Longdat2$Dat$id, parallel = T, dropout = 15, part.size = 200)
+#' Longdat2$Dat$id, parallel = T, stop = 15, part.size = 200)
 #' }
 #' @export
 #'
 
-LongDataCluster <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "standardize", parallel = FALSE, dropout = 20, part.size = 300, ...){
+LongDataCluster <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "standardize", parallel = FALSE, stop = 20, part.size = 300, ...){
   id.list = unique(id)
   if (parallel) {
     splits = floor(length(unique(id))/part.size)
@@ -42,7 +42,7 @@ LongDataCluster <- function(x, Y, id, functional = "bs", preprocess = TRUE, weig
     id.split = sample(rep(seq(splits), length.out = length(id.list)))
     pure.leaves = foreach(ii = seq(splits), .combine = c) %dopar% {
       grpID = id.list[id.split==ii]
-      output = LongDataClusterMain(x=x[id %in% grpID], Y=data.matrix(Y)[id %in% grpID,], id=id[id %in% grpID], functional = functional, preprocess = preprocess, weight.func = weight.func, parallel = TRUE, dropout = dropout, ...)
+      output = LongDataClusterMain(x=x[id %in% grpID], Y=data.matrix(Y)[id %in% grpID,], id=id[id %in% grpID], functional = functional, preprocess = preprocess, weight.func = weight.func, parallel = TRUE, stop = stop, ...)
       return(output$pure.leaf)
     }
 
@@ -56,7 +56,7 @@ LongDataCluster <- function(x, Y, id, functional = "bs", preprocess = TRUE, weig
       splits = ceiling(len/part.size)
       id.split = sample(rep(seq(splits), length.out = len))
       pure.leaves = foreach(ii = seq(splits), .combine = c) %dopar% {
-        output = FinalCluster(pure.leaf = pure.leaves[id.split == ii], dropout = dropout, weight.func = weight.func)
+        output = FinalCluster(pure.leaf = pure.leaves[id.split == ii], stop = stop, weight.func = weight.func)
         return(output$pure.leaf)
       }
     }
@@ -103,7 +103,7 @@ LongDataCluster <- function(x, Y, id, functional = "bs", preprocess = TRUE, weig
                             preprocess = preprocess,
                             weight.func= weight.func,
                             parallel   = parallel,
-                            dropout    = dropout,
+                            stop       = stop,
                             part.size  = part.size)))
 }
 

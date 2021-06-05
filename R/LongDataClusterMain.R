@@ -7,11 +7,11 @@
 #' @param preprocess boolean, whether data pre-processing procedure should be applied. Default is TRUE to handle subjects with observations less than number of parameters. If set to FALSE, those subjects will be excluded.
 #' @param weight.func A string from c("standardize", "softmax"), a method to handle weights across multiple outcomes. Default is "standardize", but "softmax" is recommended for cases with a lot noise (indistinguishable) outcomes
 #' @param parallel boolean, indicating whether parallel computing should be implemented. Default is FALSE
-#' @param dropout An integer, only required in parallel computing. It indicates when to dropout hierarchical clustering process in each slave/serve
+#' @param stop An integer, only required in parallel computing. It indicates when to stop hierarchical clustering process in each slave/serve
 #' @param ... Additional arguments for the functional bases. The default is cubic B-spline with 3 interval knots
 #' @return A list object containing the hierarchical clustering results, and some ancillary outputs for parallel computing. The optimal number of clusters will not be determined by this function.
 
-LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "standardize", parallel = FALSE, dropout = 20, ...) {
+LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "standardize", parallel = FALSE, stop = 20, ...) {
   # define weight function
   if (weight.func == "standardize") {
     w.func <- function(w) {w/sum(w)}
@@ -320,7 +320,7 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
     }
 
     if (parallel) {
-      if (n.tmp <= dropout) {
+      if (n.tmp <= stop) {
         break
       }
     }

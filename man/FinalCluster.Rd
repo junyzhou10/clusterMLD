@@ -4,12 +4,12 @@
 \alias{FinalCluster}
 \title{Ancillary function for parallel computing}
 \usage{
-FinalCluster(pure.leaf, dropout = 1, weight.func)
+FinalCluster(pure.leaf, stop = 1, weight.func)
 }
 \arguments{
 \item{pure.leaf}{Output from LongDataCluster.core in each server}
 
-\item{dropout}{When iteratively applying parallel idea, the drop out when a certain number of clusters are left}
+\item{stop}{When iteratively applying parallel idea, stop when a certain number of clusters are left}
 
 \item{weight.func}{weight function}
 }

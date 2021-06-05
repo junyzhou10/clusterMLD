@@ -12,7 +12,7 @@ LongDataClusterMain(
   preprocess = TRUE,
   weight.func = "standardize",
   parallel = FALSE,
-  dropout = 20,
+  stop = 20,
   ...
 )
 }
@@ -31,7 +31,7 @@ LongDataClusterMain(
 
 \item{parallel}{boolean, indicating whether parallel computing should be implemented. Default is FALSE}
 
-\item{dropout}{An integer, only required in parallel computing. It indicates when to dropout hierarchical clustering process in each slave/serve}
+\item{stop}{An integer, only required in parallel computing. It indicates when to stop hierarchical clustering process in each slave/serve}
 
 \item{...}{Additional arguments for the functional bases. The default is cubic B-spline with 3 interval knots}
 }
