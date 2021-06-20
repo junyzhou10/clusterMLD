@@ -3,22 +3,22 @@
 #' @param Cluster.object The object return from function LongDataCluster
 #' @param No.Cluster User specified number of clusters
 #' @param CH If TRUE, use optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gap.b
+#' @param max.plots When there are multiple outcomes, the maximum number of figures to show. The outcomes with largest weights will be selected.
+#' @param rev.ord If TRUE, the outcomes with smallest weights will be displayed. Default is FALSE.
 #' @return A figure yield by plotly, which mean trajectories in different colors.
 #' @import dplyr ggplot2
 #' @importFrom stats reshape
 #' @importFrom plotly highlight ggplotly highlight_key
-#' @examples \dontrun{
-#' require(doMC)
-#' registerDoMC(cores = 6)
-#' output = LongDataCluster(Longdat2$Dat$obs,
-#' Longdat2$Dat[,paste("y", seq(5), sep = "_")],
-#' Longdat2$Dat$id, parallel = T, dropout = 15, part.size = 200)
+#' @examples
+#' output = LongDataCluster(Longdat$Dat$obs,
+#'                          Longdat$Dat[,paste("y", seq(5), sep = "_")],
+#'                          Longdat$Dat$id)
 #' MeanPlot(output)
-#' }
+#'
 #' @export
 
 
-MeanPlot <- function(Cluster.object, No.Cluster = NULL, CH = FALSE) {
+MeanPlot <- function(Cluster.object, No.Cluster = NULL, CH = FALSE, max.plots = 6, rev.ord = F) {
   # inputs
   if (is.null(No.Cluster)) {
     NoCl  = ifelse(CH, Cluster.object$No.CH, Cluster.object$No.Gapb)
@@ -28,6 +28,19 @@ MeanPlot <- function(Cluster.object, No.Cluster = NULL, CH = FALSE) {
 
   # determine the number of columns according to the number of outcomes
   no.Y = dim(data.matrix(Cluster.object$calls$Y))[2]
+  # see how many outcomes should be displayed
+  if (no.Y > max.plots) {
+    no.Y = max.plots
+    if (rev.ord) { # select by smaller weights
+      sel.y = order(Cluster.object$weight)<=max.plots
+    } else { # select by larger weights
+      sel.y = order(Cluster.object$weight, decreasing = T)<=max.plots
+    }
+
+    Y.dat = Cluster.object$calls$Y.dat[,sel.y]
+  } else {
+    Y.dat = Cluster.object$calls$Y.dat
+  }
   mod3 = no.Y %% 3
   mod4 = no.Y %% 4
   if (mod3==0) {
@@ -49,7 +62,6 @@ MeanPlot <- function(Cluster.object, No.Cluster = NULL, CH = FALSE) {
   cluster.ID = Cluster.object$Cluster.Lists[[NoCl]]
   x.bs = Cluster.object$calls$x.bs
   id.seq  = Cluster.object$calls$id
-  Y.dat = Cluster.object$calls$Y.dat;
   id.sample = sample(no.obs, min(no.obs, 1000))
   x.sample  = Cluster.object$calls$x[id.sample];
   x.ord     = order(x.sample); x.sample = x.sample[x.ord]

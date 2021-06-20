@@ -4,7 +4,13 @@
 \alias{MeanPlot}
 \title{Plot estimated mean trajectories for each detected cluster}
 \usage{
-MeanPlot(Cluster.object, No.Cluster = NULL, CH = FALSE)
+MeanPlot(
+  Cluster.object,
+  No.Cluster = NULL,
+  CH = FALSE,
+  max.plots = 6,
+  rev.ord = F
+)
 }
 \arguments{
 \item{Cluster.object}{The object return from function LongDataCluster}
@@ -12,6 +18,10 @@ MeanPlot(Cluster.object, No.Cluster = NULL, CH = FALSE)
 \item{No.Cluster}{User specified number of clusters}
 
 \item{CH}{If TRUE, use optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gap.b}
+
+\item{max.plots}{When there are multiple outcomes, the maximum number of figures to show. The outcomes with largest weights will be selected.}
+
+\item{rev.ord}{If TRUE, the outcomes with smallest weights will be displayed. Default is FALSE.}
 }
 \value{
 A figure yield by plotly, which mean trajectories in different colors.
@@ -20,12 +30,9 @@ A figure yield by plotly, which mean trajectories in different colors.
 Based on output from LongDataCluster, yield the corresponding mean curves
 }
 \examples{
-\dontrun{
-require(doMC)
-registerDoMC(cores = 6)
-output = LongDataCluster(Longdat2$Dat$obs,
-Longdat2$Dat[,paste("y", seq(5), sep = "_")],
-Longdat2$Dat$id, parallel = T, dropout = 15, part.size = 200)
+output = LongDataCluster(Longdat$Dat$obs,
+                         Longdat$Dat[,paste("y", seq(5), sep = "_")],
+                         Longdat$Dat$id)
 MeanPlot(output)
-}
+
 }
