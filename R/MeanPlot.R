@@ -37,7 +37,7 @@ MeanPlot <- function(Cluster.object, No.Cluster = NULL, CH = FALSE, max.plots = 
       sel.y = order(Cluster.object$weight, decreasing = T)<=max.plots
     }
 
-    Y.dat = Cluster.object$calls$Y.dat[,sel.y]
+    Y.dat = as.matrix(Cluster.object$calls$Y.dat[,sel.y])
   } else {
     Y.dat = Cluster.object$calls$Y.dat
   }
@@ -70,6 +70,7 @@ MeanPlot <- function(Cluster.object, No.Cluster = NULL, CH = FALSE, max.plots = 
   for (cc in seq(NoCl)) {
     x0  = x.bs[which(id.seq %in% cluster.ID[[cc]]), ]
     y0  = Y.dat[which(id.seq %in% cluster.ID[[cc]]), ]
+
     plot_dat = rbind(plot_dat, data.frame(x.fit %*% ginv(t(x0) %*% x0) %*% t(x0) %*% t(t(y0)), x = x.sample, grp = paste("Cluster",cc)))
   }
   if (ncol(Y.dat)==1) {colnames(plot_dat) <- c("y","x","grp"); colnames(Y.dat) <- "y"}
