@@ -11,8 +11,7 @@
 #' @param ... Additional arguments for the functional bases. The default is cubic B-spline with 3 interval knots
 #' @return A list object containing the hierarchical clustering results, and some ancillary outputs for parallel computing. The optimal number of clusters will not be determined by this function.
 
-
-LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "standardize", parallel = FALSE, stop = 20, ...) {
+test <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "standardize", parallel = FALSE, stop = 20, ...) {
   # define weight function
   if (weight.func == "standardize") {
     w.func <- function(w) {w/sum(w)}
@@ -22,7 +21,7 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
     warning("weight.func is not correctly specified!")
     return(NULL)
   }
-
+  
   args <- list(...)
   if (!"df" %in% names(args)) {
     if (functional == "bs") {
@@ -30,7 +29,7 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
     } else if (functional == "ns") {
       x.bs = ns( x, df = 7, intercept = T, ...)
     }
-
+    
   } else {
     if (functional == "bs") {
       x.bs = bs( x, intercept = T, ...)
@@ -38,48 +37,49 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
       x.bs = ns( x, intercept = T, ...)
     }
   }
-
+  
   x.list = split(as.data.frame(x.bs),  id)
   x.list = lapply(x.list, data.matrix)
   Y.dat  = apply(data.matrix(Y), 2, scale) # in case input Y is a vector
   y.list = split(as.data.frame(Y.dat),  id)
   y.list = lapply(y.list, data.matrix)
-
+  
   # some global variables
-  p.var   = dim(x.bs)[2] # number of parameters
-  y.dim   = dim(Y.dat)[2] # number of outcomes
+  p.var   = ncol(x.bs) # number of parameters
+  y.dim   = ncol(Y.dat) # number of outcomes
   id.list = id.wait = unique(id) # individual id
   id.seq  = id # total id sequence, used a lot in filter data
-  obs.no  = unlist(lapply(x.list, function(x) dim(x)[1])) # the # observations for each subject
-
+  obs.no  = unlist(lapply(x.list, function(x) nrow(x))) # the # observations for each subject
+  
   x.wait  = x.bs[which(id.seq %in% id.wait), ]
   y.wait  = data.matrix(Y.dat[which(id.seq %in% id.wait),])
   XX.wait = XX.remain = t(x.wait) %*% x.wait
   Xy.wait = Xy.remain = t(x.wait) %*% t(t(y.wait))
   Y2.wait = Y2.remain = colSums(y.wait^2)
   SSR.all = Y2.wait - diag(t(Xy.wait) %*% ginv(XX.wait) %*% Xy.wait)
-  e.sigma = SSR.all/(dim(x.wait)[1] - p.var)
-
+  e.sigma = SSR.all/(nrow(x.wait) - p.var)
+  
   ## Generate profile for each subject
   pure.leaf = NULL
   for (i in seq(length(x.list))) {
     x.in    = x.list[[i]]
     y.in    = y.list[[i]]
-    N.in    = dim(x.in)[1]
+    N.in    = nrow(x.in)
     XX      = t(x.in) %*% x.in
     A.mat   = ginv(XX)
     Xy      = t(x.in) %*% t(t(y.in))
     Y2      = colSums(y.in^2)
     SSR0    = diag(Y2 - t(Xy) %*% A.mat %*% Xy)
     SSR.r   = diag(Y2.wait - Y2 - t(Xy.wait-Xy) %*% solve(XX.wait - XX) %*% (Xy.wait-Xy))
-    SSR.dist= SSR.all - SSR0 - SSR.r
+    # SSR.dist= SSR.all - SSR0 - SSR.r
+    SSR.dist= (SSR.all - SSR0 - SSR.r)/(SSR0 + SSR.r)*(sum(obs.no) - 2*p.var) # p could be neglected
     leaf.new = list(id.in = id.list[i], A.mat = A.mat, XX = XX, Xy = Xy, Y2 = Y2, N.in = N.in, SSR0 = SSR0, SSR.dist = SSR.dist)
-
+    
     pure.leaf = c(pure.leaf, list(leaf.new))
   }
   pure.leaf0 = pure.leaf
-
-
+  
+  
   if (preprocess) {
     ## Check if all subjects have enough observations. If not, implement data pre-preprocess
     if (min(obs.no) <= p.var) { # some of them do not have enough observations, need further combination of subjects
@@ -93,7 +93,7 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
         Xy0 = t(x0) %*% t(t(y0))
         Y20 = colSums(y0^2)
         ssr0 = Y20 - diag(t(Xy0) %*% ginv(XX0) %*% Xy0)
-
+        
         weight = ssr0/(colSums(do.call(rbind, lapply(pure.leaf[which(obs.no > p.var)], function(x) x$SSR0))))-1;
         weight = w.func(weight)
       }
@@ -102,7 +102,7 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
       # we first generate the MSR table for all pairs, if after combination still could not calculate SSR, leave Inf
       n.leaf   = length(pure.leaf)
       Dist.tab = matrix(Inf, n.leaf, n.leaf)
-
+      
       # An original distance matrix to record all pairewise distance between pure subgroups
       for ( i in seq(n.leaf-1) ) {
         for ( j in (i+1):n.leaf ) {
@@ -117,24 +117,24 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
           }
         }
       }
-
+      
       # then, combine the individuals with smallest MSR, and update the distance matrix
       while( TRUE ) {
         length.in = unlist(lapply(pure.leaf, function(x) x$N.in))
         if (sum(length.in <= p.var) < 1) {
           break
         }
-
+        
         Dist.tmp = Dist.tab[which(length.in <= p.var), ]
-
+        
         ij = which(Dist.tmp==min(Dist.tmp), arr.ind = T)
         if (length(ij) == 1) {
           ij = c(1, ij)
         }
         i  = ij[1]; i = which(length.in <= p.var)[i]
         j  = ij[2]
-
-
+        
+        
         # 1. First update pure.leaf by removing ij and adding one combined subgroup
         Y2.merge = pure.leaf[[i]]$Y2 + pure.leaf[[j]]$Y2
         Xy.merge = pure.leaf[[i]]$Xy + pure.leaf[[j]]$Xy
@@ -161,21 +161,21 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
         Xy0 = t(x0) %*% t(t(y0))
         Y20 = colSums(y0^2)
         ssr0 = Y20 - diag(t(Xy0) %*% ginv(XX0) %*% Xy0)
-
-
+        
+        
         # notice after the first merge, weight will be 0 if using previous calculation, so still treat it as equal weight
         if (length(pure.leaf) < (n.leaf-1) ) {
           weight    = ssr0/(colSums(do.call(rbind, lapply(pure.leaf[which(length.in > p.var)], function(x) x$SSR0))))-1;
           # weight[3:5] = weight[3:5]/3
           weight = w.func(weight)
         }
-
-
+        
+        
         # 2. Update distance matrix by removing ij, and add one row/column with distance between new subgroup to all rest subgroups
         Dist.new = NULL
         Dist.tab = data.matrix(Dist.tab[-c(i,j), -c(i,j)]);
-
-        for ( k in seq(dim(Dist.tab)[1]) ) {
+        
+        for ( k in seq(nrow(Dist.tab)) ) {
           Y2.merge = pure.leaf[[k]]$Y2 + leaf.merge$Y2
           Xy.merge = pure.leaf[[k]]$Xy + leaf.merge$Xy
           XX.merge = pure.leaf[[k]]$XX + leaf.merge$XX
@@ -185,14 +185,14 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
           Dist.new = c(Dist.new, sum(weight*SSR.merge)/N.merge)
         }
         Dist.tab = cbind(Dist.tab, Dist.new)
-        Dist.tab = rbind(Dist.tab, rep(Inf, dim(Dist.tab)[2]))
+        Dist.tab = rbind(Dist.tab, rep(Inf, ncol(Dist.tab)))
       }
     } else {
       weight = SSR.all/(colSums(do.call(rbind, lapply(pure.leaf, function(x) x$SSR0))))-1
       weight = w.func(weight)
       n.leaf   = length(pure.leaf)
       Dist.tab = matrix(Inf, n.leaf, n.leaf)
-
+      
       # An original distance matrix to record all pairewise distance between pure subgroups
       for ( i in seq(n.leaf-1) ) {
         for ( j in (i+1):n.leaf ) {
@@ -202,7 +202,8 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
           # A.merge  = pure.leaf[[i]]$A.mat - pure.leaf[[i]]$A.mat %*% ginv(pure.leaf[[i]]$A.mat + pure.leaf[[j]]$A.mat) %*% pure.leaf[[i]]$A.mat
           A.merge  = ginv(XX.merge)
           SSR.merge= diag(Y2.merge - t(Xy.merge) %*% A.merge %*% Xy.merge)
-          Dist.tab[i,j] = sum((SSR.merge - pure.leaf[[i]]$SSR0 - pure.leaf[[j]]$SSR0)*weight) # if knots changed during pure group generation, this should be SSR.merge/(df-dfi-dfj)
+          # Dist.tab[i,j] = sum((SSR.merge - pure.leaf[[i]]$SSR0 - pure.leaf[[j]]$SSR0)*weight) # if knots changed during pure group generation, this should be SSR.merge/(df-dfi-dfj)
+          Dist.tab[i,j] = sum(((SSR.merge - pure.leaf[[i]]$SSR0 - pure.leaf[[j]]$SSR0)/(pure.leaf[[i]]$SSR0 + pure.leaf[[j]]$SSR0)*(pure.leaf[[i]]$N.in + pure.leaf[[j]]$N.in - 2*p.var))*weight)
         }
       }
     }
@@ -214,13 +215,13 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
     Xy0 = t(x0) %*% t(t(y0))
     Y20 = colSums(y0^2)
     ssr0 = Y20 - diag(t(Xy0) %*% ginv(XX0) %*% Xy0)
-
+    
     weight = ssr0/(colSums(do.call(rbind, lapply(pure.leaf[which(obs.no > p.var)], function(x) x$SSR0))))-1;
     weight = w.func(weight)
     pure.leaf = pure.leaf[which(obs.no > p.var)]
     n.leaf   = length(pure.leaf)
     Dist.tab = matrix(Inf, n.leaf, n.leaf)
-
+    
     # An original distance matrix to record all pairewise distance between pure subgroups
     for ( i in seq(n.leaf-1) ) {
       for ( j in (i+1):n.leaf ) {
@@ -230,14 +231,15 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
         # A.merge  = pure.leaf[[i]]$A.mat - pure.leaf[[i]]$A.mat %*% ginv(pure.leaf[[i]]$A.mat + pure.leaf[[j]]$A.mat) %*% pure.leaf[[i]]$A.mat
         A.merge  = ginv(XX.merge)
         SSR.merge= diag(Y2.merge - t(Xy.merge) %*% A.merge %*% Xy.merge)
-        Dist.tab[i,j] = sum((SSR.merge - pure.leaf[[i]]$SSR0 - pure.leaf[[j]]$SSR0)*weight) # if knots changed during pure group generation, this should be SSR.merge/(df-dfi-dfj)
+        # Dist.tab[i,j] = sum((SSR.merge - pure.leaf[[i]]$SSR0 - pure.leaf[[j]]$SSR0)*weight) # if knots changed during pure group generation, this should be SSR.merge/(df-dfi-dfj)
+        Dist.tab[i,j] = sum(((SSR.merge - pure.leaf[[i]]$SSR0 - pure.leaf[[j]]$SSR0)/(pure.leaf[[i]]$SSR0 + pure.leaf[[j]]$SSR0)*(pure.leaf[[i]]$N.in + pure.leaf[[j]]$N.in - 2*p.var))*weight)
       }
     }
   }
-
-
-
-
+  
+  
+  
+  
   ## Generate all inter-cluster distances
   Dist.inter = NULL # inter-cluster (or so-called between cluster distance)
   for (i in seq(length(pure.leaf))) {
@@ -246,19 +248,19 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
     SSR.s= Y2.wait - pure.leaf[[i]]$Y2 - diag(t(xy.s) %*% ginv(xx.s) %*% xy.s)
     Dist.inter = c(Dist.inter, sum((SSR.all - SSR.s - pure.leaf[[i]]$SSR0)*weight))
   }
-
+  
   ##============= Based on pure.leaf and Dist.tab, start hierachical merging ==============##
   out.ID  = list(lapply(pure.leaf, function(x) x$id.in))
   B.dist  = sum(Dist.inter)
   Name.L   = list(as.character(seq(length(pure.leaf))))
   Addres   = numeric(0)
   W.dist   = sum(colSums(do.call(rbind, lapply(pure.leaf, function(x) x$SSR0)))*weight)
-
+  
   while (TRUE) {
     ij = which(Dist.tab==min(Dist.tab), arr.ind = T)
     i  = ij[1]
     j  = ij[2]
-
+    
     # 1. First update pure.leaf by removing ij and adding one combined subgroup
     Y2.merge = pure.leaf[[i]]$Y2 + pure.leaf[[j]]$Y2
     Xy.merge = pure.leaf[[i]]$Xy + pure.leaf[[j]]$Xy
@@ -275,58 +277,58 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
                       Y2    = Y2.merge,
                       N.in  = N.merge,
                       SSR0  = SSR.merge)
-
+    
     # farthest distance / second smallest distance
-
+    
     # B.mean = c(mean(tmp.D), B.mean)
     # B.sd   = c(sd(tmp.D), B.sd)
     pq = which(Dist.tab==max(Dist.tab[is.finite(Dist.tab)]), arr.ind = T)
     ii  = pq[1]
     jj  = pq[2]
-
+    
     # update leaf info, SSR, and ID
     pure.leaf = c(pure.leaf[-ij], list(leaf.merge))
     W.dist    = c(sum(colSums(do.call(rbind, lapply(pure.leaf, function(x) x$SSR0)))*weight), W.dist)
     out.ID    = c(list(c(out.ID[[1]][-ij], list(unlist(out.ID[[1]][ij])))), out.ID)
     Name.L    = c(Name.L, list( c(Name.L[[length(Name.L)]][-ij],  paste0(c(Name.L[[length(Name.L)]][i], Name.L[[length(Name.L)]][j]), collapse = ","))  ))
     Addres    = c(min(Dist.tab)/p.var, Addres)
-
+    
     # update Dist.inter
     xy.s = Xy.wait - leaf.merge$Xy
     xx.s = XX.wait - leaf.merge$XX
     SSR.s= Y2.wait - leaf.merge$Y2 - diag(t(xy.s) %*% ginv(xx.s) %*% xy.s)
     Dist.inter = c(Dist.inter[-ij], sum(( SSR.all - SSR.s - leaf.merge$SSR0)*weight))
     B.dist  = c(sum(Dist.inter), B.dist)
-
+    
     n.tmp = length(pure.leaf)
     # 2. Update distance matrix by removing ij, and add one row/column with distance between new subgroup to all rest subgroups
     Dist.new = NULL
     Dist.tab = data.matrix(Dist.tab[-ij, -ij]);
-
+    
     if (n.tmp == 1) { # no need for further combine
       Dist.tab = leaf.merge$SSR0
       break
     } else {
-      for ( k in seq(dim(Dist.tab)[1]) ) {
+      for ( k in seq(nrow(Dist.tab)) ) {
         Y2.merge = pure.leaf[[k]]$Y2 + leaf.merge$Y2
         Xy.merge = pure.leaf[[k]]$Xy + leaf.merge$Xy
         XX.merge = pure.leaf[[k]]$XX + leaf.merge$XX
         # A.merge  = pure.leaf[[k]]$A.mat - pure.leaf[[k]]$A.mat %*% ginv(pure.leaf[[k]]$A.mat + leaf.merge$A.mat) %*% pure.leaf[[k]]$A.mat
         A.merge  = ginv(XX.merge)
         SSR.merge= diag(Y2.merge - t(Xy.merge) %*% A.merge %*% Xy.merge)
-        Dist.new = c(Dist.new, sum(weight*(SSR.merge - pure.leaf[[k]]$SSR0 - leaf.merge$SSR0)))
+        Dist.new = c(Dist.new, sum(weight*((SSR.merge - pure.leaf[[k]]$SSR0 - leaf.merge$SSR0)/(pure.leaf[[k]]$SSR0 + leaf.merge$SSR0)*(pure.leaf[[k]]$N.in + leaf.merge$N.in - 2*p.var))))
       }
       Dist.tab = cbind(Dist.tab, Dist.new)
-      Dist.tab = rbind(Dist.tab, rep(Inf, dim(Dist.tab)[2]))
+      Dist.tab = rbind(Dist.tab, rep(Inf, ncol(Dist.tab)))
     }
-
+    
     if (parallel) {
       if (n.tmp <= stop) {
         break
       }
     }
   }
-
+  
   return(list(out.ID = out.ID,
               pure.leaf = pure.leaf,
               Dist.tab = Dist.tab,

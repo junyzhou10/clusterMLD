@@ -34,7 +34,11 @@
 #' @export
 #'
 
-LongDataCluster <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "standardize", parallel = FALSE, stop = 20, part.size = 300, ...){
+LongDataCluster <- function(x, Y, id, 
+                            functional = "bs", 
+                            preprocess = TRUE, 
+                            weight.func = "standardize", 
+                            parallel = FALSE, stop = 20, part.size = 300, ...){
   id.list = unique(id)
   if (parallel) {
     splits = floor(length(unique(id))/part.size)
@@ -42,7 +46,8 @@ LongDataCluster <- function(x, Y, id, functional = "bs", preprocess = TRUE, weig
     id.split = sample(rep(seq(splits), length.out = length(id.list)))
     pure.leaves = foreach(ii = seq(splits), .combine = c) %dopar% {
       grpID = id.list[id.split==ii]
-      output = LongDataClusterMain(x=x[id %in% grpID], Y=data.matrix(Y)[id %in% grpID,], id=id[id %in% grpID], functional = functional, preprocess = preprocess, weight.func = weight.func, parallel = TRUE, stop = stop, ...)
+      # output = LongDataClusterMain(x=x[id %in% grpID], Y=data.matrix(Y)[id %in% grpID,], id=id[id %in% grpID], functional = functional, preprocess = preprocess, weight.func = weight.func, parallel = TRUE, stop = stop, ...)
+      output = test(x=x[id %in% grpID], Y=data.matrix(Y)[id %in% grpID,], id=id[id %in% grpID], functional = functional, preprocess = preprocess, weight.func = weight.func, parallel = TRUE, stop = stop, ...)
       return(output$pure.leaf)
     }
 
@@ -62,7 +67,8 @@ LongDataCluster <- function(x, Y, id, functional = "bs", preprocess = TRUE, weig
     }
     res = FinalCluster(pure.leaf = pure.leaves, weight.func = weight.func)
   } else {
-    res = LongDataClusterMain(x=x, Y=Y, id=id, functional = functional, preprocess = preprocess, weight.func = weight.func, ...)
+    # res = LongDataClusterMain(x=x, Y=Y, id=id, functional = functional, preprocess = preprocess, weight.func = weight.func, ...)
+    res = test(x=x, Y=Y, id=id, functional = functional, preprocess = preprocess, weight.func = weight.func, ...)
   }
 
   # final output
