@@ -1,5 +1,5 @@
 #' @title Clustering longitudinal data (not for call)
-#' @description Clustering longitudinal data, expecially tailored for those observational longitudinal data with sparse and irregular observations. The output could be a vector, i.e., at each occasion, more than one measure are observed for each subject.
+#' @description Clustering longitudinal data, corresponding to unweighted DistMetric argument, expecially tailored for those observational longitudinal data with sparse and irregular observations. The output could be a vector, i.e., at each occasion, more than one measure are observed for each subject.
 #' @param x A vector in long format, occassions or time of observation times.
 #' @param Y A matrix, if multiple outcomes exist; or a (column) vector, for single outcome case
 #' @param id A vector with same length of x, represents the corresponding subject id of each observation
@@ -12,7 +12,7 @@
 #' @return A list object containing the hierarchical clustering results, and some ancillary outputs for parallel computing. The optimal number of clusters will not be determined by this function.
 
 
-LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "standardize", parallel = FALSE, stop = 20, ...) {
+LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "standardize", parallel = FALSE, stop = 20, ...) {
   # define weight function
   if (weight.func == "standardize") {
     w.func <- function(w) {w/sum(w)}
@@ -46,11 +46,11 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
   y.list = lapply(y.list, data.matrix)
 
   # some global variables
-  p.var   = dim(x.bs)[2] # number of parameters
-  y.dim   = dim(Y.dat)[2] # number of outcomes
+  p.var   = ncol(x.bs) # number of parameters
+  y.dim   = ncol(Y.dat) # number of outcomes
   id.list = id.wait = unique(id) # individual id
   id.seq  = id # total id sequence, used a lot in filter data
-  obs.no  = unlist(lapply(x.list, function(x) dim(x)[1])) # the # observations for each subject
+  obs.no  = unlist(lapply(x.list, function(x) nrow(x))) # the # observations for each subject
 
   x.wait  = x.bs[which(id.seq %in% id.wait), ]
   y.wait  = data.matrix(Y.dat[which(id.seq %in% id.wait),])
@@ -58,14 +58,14 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
   Xy.wait = Xy.remain = t(x.wait) %*% t(t(y.wait))
   Y2.wait = Y2.remain = colSums(y.wait^2)
   SSR.all = Y2.wait - diag(t(Xy.wait) %*% ginv(XX.wait) %*% Xy.wait)
-  e.sigma = SSR.all/(dim(x.wait)[1] - p.var)
+  e.sigma = SSR.all/(nrow(x.wait) - p.var)
 
   ## Generate profile for each subject
   pure.leaf = NULL
   for (i in seq(length(x.list))) {
     x.in    = x.list[[i]]
     y.in    = y.list[[i]]
-    N.in    = dim(x.in)[1]
+    N.in    = nrow(x.in)
     XX      = t(x.in) %*% x.in
     A.mat   = ginv(XX)
     Xy      = t(x.in) %*% t(t(y.in))
@@ -175,7 +175,7 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
         Dist.new = NULL
         Dist.tab = data.matrix(Dist.tab[-c(i,j), -c(i,j)]);
 
-        for ( k in seq(dim(Dist.tab)[1]) ) {
+        for ( k in seq(nrow(Dist.tab)) ) {
           Y2.merge = pure.leaf[[k]]$Y2 + leaf.merge$Y2
           Xy.merge = pure.leaf[[k]]$Xy + leaf.merge$Xy
           XX.merge = pure.leaf[[k]]$XX + leaf.merge$XX
@@ -185,7 +185,7 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
           Dist.new = c(Dist.new, sum(weight*SSR.merge)/N.merge)
         }
         Dist.tab = cbind(Dist.tab, Dist.new)
-        Dist.tab = rbind(Dist.tab, rep(Inf, dim(Dist.tab)[2]))
+        Dist.tab = rbind(Dist.tab, rep(Inf, ncol(Dist.tab)))
       }
     } else {
       weight = SSR.all/(colSums(do.call(rbind, lapply(pure.leaf, function(x) x$SSR0))))-1
@@ -307,7 +307,7 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
       Dist.tab = leaf.merge$SSR0
       break
     } else {
-      for ( k in seq(dim(Dist.tab)[1]) ) {
+      for ( k in seq(nrow(Dist.tab)) ) {
         Y2.merge = pure.leaf[[k]]$Y2 + leaf.merge$Y2
         Xy.merge = pure.leaf[[k]]$Xy + leaf.merge$Xy
         XX.merge = pure.leaf[[k]]$XX + leaf.merge$XX
@@ -317,7 +317,7 @@ LongDataClusterMain <- function(x, Y, id, functional = "bs", preprocess = TRUE, 
         Dist.new = c(Dist.new, sum(weight*(SSR.merge - pure.leaf[[k]]$SSR0 - leaf.merge$SSR0)))
       }
       Dist.tab = cbind(Dist.tab, Dist.new)
-      Dist.tab = rbind(Dist.tab, rep(Inf, dim(Dist.tab)[2]))
+      Dist.tab = rbind(Dist.tab, rep(Inf, ncol(Dist.tab)))
     }
 
     if (parallel) {

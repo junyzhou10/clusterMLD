@@ -3,6 +3,7 @@
 #' @param x A vector in long format, occassions or time of observation times
 #' @param Y A matrix, if multiple outcomes exist; or a (column) vector, for single outcome case
 #' @param id A vector with same length of x, represents the corresponding subject id of each observation
+#' @param DistMetric c(W, UnW) for Weighted, and Unweighted distance metric. Default is Weighted.
 #' @param functional A string from c("bs", "ns"), indicating b-splines and natural splines
 #' @param preprocess boolean, whether data pre-processing procedure should be applied. Default is TRUE to handle subjects with observations less than number of parameters. If set to FALSE, those subjects will be excluded
 #' @param weight.func A string from c("standardize", "softmax"), a method to handle weights across multiple outcomes. Default is "standardize", but "softmax" is recommended for cases with a lot noise (indistinguishable) outcomes
@@ -35,6 +36,7 @@
 #'
 
 LongDataCluster <- function(x, Y, id, 
+                            DistMetric = "W",
                             functional = "bs", 
                             preprocess = TRUE, 
                             weight.func = "standardize", 
@@ -46,8 +48,12 @@ LongDataCluster <- function(x, Y, id,
     id.split = sample(rep(seq(splits), length.out = length(id.list)))
     pure.leaves = foreach(ii = seq(splits), .combine = c) %dopar% {
       grpID = id.list[id.split==ii]
-      # output = LongDataClusterMain(x=x[id %in% grpID], Y=data.matrix(Y)[id %in% grpID,], id=id[id %in% grpID], functional = functional, preprocess = preprocess, weight.func = weight.func, parallel = TRUE, stop = stop, ...)
-      output = test(x=x[id %in% grpID], Y=data.matrix(Y)[id %in% grpID,], id=id[id %in% grpID], functional = functional, preprocess = preprocess, weight.func = weight.func, parallel = TRUE, stop = stop, ...)
+      if (DistMetric == "W") {
+        output = LongDataClusterW(x=x[id %in% grpID], Y=data.matrix(Y)[id %in% grpID,], id=id[id %in% grpID], functional = functional, preprocess = preprocess, weight.func = weight.func, parallel = TRUE, stop = stop, ...)
+      } else if (DistMetric == "UnW") {
+        output = LongDataClusterUnW(x=x[id %in% grpID], Y=data.matrix(Y)[id %in% grpID,], id=id[id %in% grpID], functional = functional, preprocess = preprocess, weight.func = weight.func, parallel = TRUE, stop = stop, ...)
+      }
+      
       return(output$pure.leaf)
     }
 
@@ -67,8 +73,11 @@ LongDataCluster <- function(x, Y, id,
     }
     res = FinalCluster(pure.leaf = pure.leaves, weight.func = weight.func)
   } else {
-    # res = LongDataClusterMain(x=x, Y=Y, id=id, functional = functional, preprocess = preprocess, weight.func = weight.func, ...)
-    res = test(x=x, Y=Y, id=id, functional = functional, preprocess = preprocess, weight.func = weight.func, ...)
+    if (DistMetric == "W") {
+      res = LongDataClusterW(x=x, Y=Y, id=id, functional = functional, preprocess = preprocess, weight.func = weight.func, ...)
+    } else if (DistMetric == "UnW") {
+      res = LongDataClusterUnW(x=x, Y=Y, id=id, functional = functional, preprocess = preprocess, weight.func = weight.func, ...)
+    }
   }
 
   # final output
@@ -89,7 +98,8 @@ LongDataCluster <- function(x, Y, id,
   }
 
   p.var = dim(res$pure.leaf[[1]]$XX)[1]
-  Gap_b     = res$B.dist - seq(1, length(res$B.dist))*p.var*res$e.sigma
+  # Gap_b     = res$B.dist - seq(1, length(res$B.dist))*p.var*res$e.sigma
+  Gap_b     = res$B.dist - seq(1, length(res$B.dist))*(length(x) - 2*p.var)/(length(x) - 2*p.var - 2) # when using Chow-test as distance
   N.cluster = ifelse(sum(diff(Gap_b)<0)==0, 1, which(diff(Gap_b)<0)[1])
   CH.index  = res$B.dist/(seq(1,length(res$B.dist)))/res$W.dist*(length(id.list) - seq(1,length(res$B.dist))); CH.index[1] = 0
   return(list(Cluster.res = lapply(res$out.ID[[N.cluster]], sort),

@@ -1,5 +1,5 @@
 #' @title Clustering longitudinal data (not for call)
-#' @description Clustering longitudinal data, expecially tailored for those observational longitudinal data with sparse and irregular observations. The output could be a vector, i.e., at each occasion, more than one measure are observed for each subject.
+#' @description Clustering longitudinal data, corresponding to weighted DistMetric argument,, expecially tailored for those observational longitudinal data with sparse and irregular observations. The output could be a vector, i.e., at each occasion, more than one measure are observed for each subject.
 #' @param x A vector in long format, occassions or time of observation times.
 #' @param Y A matrix, if multiple outcomes exist; or a (column) vector, for single outcome case
 #' @param id A vector with same length of x, represents the corresponding subject id of each observation
@@ -11,7 +11,7 @@
 #' @param ... Additional arguments for the functional bases. The default is cubic B-spline with 3 interval knots
 #' @return A list object containing the hierarchical clustering results, and some ancillary outputs for parallel computing. The optimal number of clusters will not be determined by this function.
 
-test <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "standardize", parallel = FALSE, stop = 20, ...) {
+LongDataClusterW <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "standardize", parallel = FALSE, stop = 20, ...) {
   # define weight function
   if (weight.func == "standardize") {
     w.func <- function(w) {w/sum(w)}
@@ -232,7 +232,7 @@ test <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "
         A.merge  = ginv(XX.merge)
         SSR.merge= diag(Y2.merge - t(Xy.merge) %*% A.merge %*% Xy.merge)
         # Dist.tab[i,j] = sum((SSR.merge - pure.leaf[[i]]$SSR0 - pure.leaf[[j]]$SSR0)*weight) # if knots changed during pure group generation, this should be SSR.merge/(df-dfi-dfj)
-        Dist.tab[i,j] = sum(((SSR.merge - pure.leaf[[i]]$SSR0 - pure.leaf[[j]]$SSR0)/(pure.leaf[[i]]$SSR0 + pure.leaf[[j]]$SSR0)*(pure.leaf[[i]]$N.in + pure.leaf[[j]]$N.in - 2*p.var))*weight)
+        Dist.tab[i,j] = sum((SSR.merge - pure.leaf[[i]]$SSR0 - pure.leaf[[j]]$SSR0)/(pure.leaf[[i]]$SSR0 + pure.leaf[[j]]$SSR0)*(pure.leaf[[i]]$N.in + pure.leaf[[j]]$N.in - 2*p.var)*weight)
       }
     }
   }
@@ -246,7 +246,7 @@ test <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "
     xy.s = Xy.wait - pure.leaf[[i]]$Xy
     xx.s = XX.wait - pure.leaf[[i]]$XX
     SSR.s= Y2.wait - pure.leaf[[i]]$Y2 - diag(t(xy.s) %*% ginv(xx.s) %*% xy.s)
-    Dist.inter = c(Dist.inter, sum((SSR.all - SSR.s - pure.leaf[[i]]$SSR0)*weight))
+    Dist.inter = c(Dist.inter, sum((SSR.all - SSR.s - pure.leaf[[i]]$SSR0)/(SSR.s + pure.leaf[[i]]$SSR0)*(sum(obs.no) - 2*p.var)/p.var*weight))
   }
   
   ##============= Based on pure.leaf and Dist.tab, start hierachical merging ==============##
@@ -297,7 +297,7 @@ test <- function(x, Y, id, functional = "bs", preprocess = TRUE, weight.func = "
     xy.s = Xy.wait - leaf.merge$Xy
     xx.s = XX.wait - leaf.merge$XX
     SSR.s= Y2.wait - leaf.merge$Y2 - diag(t(xy.s) %*% ginv(xx.s) %*% xy.s)
-    Dist.inter = c(Dist.inter[-ij], sum(( SSR.all - SSR.s - leaf.merge$SSR0)*weight))
+    Dist.inter = c(Dist.inter[-ij], sum(( SSR.all - SSR.s - leaf.merge$SSR0)/(SSR.s + pure.leaf[[i]]$SSR0)*(sum(obs.no) - 2*p.var)/p.var*weight))
     B.dist  = c(sum(Dist.inter), B.dist)
     
     n.tmp = length(pure.leaf)
