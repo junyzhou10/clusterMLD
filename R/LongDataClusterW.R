@@ -246,7 +246,8 @@ LongDataClusterW <- function(x, Y, id, functional = "bs", preprocess = TRUE, wei
     xy.s = Xy.wait - pure.leaf[[i]]$Xy
     xx.s = XX.wait - pure.leaf[[i]]$XX
     SSR.s= Y2.wait - pure.leaf[[i]]$Y2 - diag(t(xy.s) %*% ginv(xx.s) %*% xy.s)
-    Dist.inter = c(Dist.inter, sum((SSR.all - SSR.s - pure.leaf[[i]]$SSR0)/(SSR.s + pure.leaf[[i]]$SSR0)*(sum(obs.no) - 2*p.var)/p.var*weight))
+    # Dist.inter = c(Dist.inter, sum((SSR.all - SSR.s - pure.leaf[[i]]$SSR0)/(SSR.s + pure.leaf[[i]]$SSR0)*(sum(obs.no) - 2*p.var)/p.var*weight))
+    Dist.inter = c(Dist.inter, sum((SSR.all - SSR.s - pure.leaf[[i]]$SSR0)*weight))
   }
   
   ##============= Based on pure.leaf and Dist.tab, start hierachical merging ==============##
@@ -297,7 +298,8 @@ LongDataClusterW <- function(x, Y, id, functional = "bs", preprocess = TRUE, wei
     xy.s = Xy.wait - leaf.merge$Xy
     xx.s = XX.wait - leaf.merge$XX
     SSR.s= Y2.wait - leaf.merge$Y2 - diag(t(xy.s) %*% ginv(xx.s) %*% xy.s)
-    Dist.inter = c(Dist.inter[-ij], sum(( SSR.all - SSR.s - leaf.merge$SSR0)/(SSR.s + pure.leaf[[i]]$SSR0)*(sum(obs.no) - 2*p.var)/p.var*weight))
+    Dist.inter = c(Dist.inter[-ij], sum(( SSR.all - SSR.s - leaf.merge$SSR0)*weight))
+    # Dist.inter = c(Dist.inter[-ij], sum(( SSR.all - SSR.s - leaf.merge$SSR0)/(SSR.s + leaf.merge$SSR0)*(sum(obs.no) - 2*p.var)/p.var*weight))
     B.dist  = c(sum(Dist.inter), B.dist)
     
     n.tmp = length(pure.leaf)

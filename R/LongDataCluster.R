@@ -3,7 +3,7 @@
 #' @param x A vector in long format, occassions or time of observation times
 #' @param Y A matrix, if multiple outcomes exist; or a (column) vector, for single outcome case
 #' @param id A vector with same length of x, represents the corresponding subject id of each observation
-#' @param DistMetric c(W, UnW) for Weighted, and Unweighted distance metric. Default is Weighted.
+#' @param DistMetric c("W", "UnW") for Weighted, and Unweighted distance metric. Default is Weighted.
 #' @param functional A string from c("bs", "ns"), indicating b-splines and natural splines
 #' @param preprocess boolean, whether data pre-processing procedure should be applied. Default is TRUE to handle subjects with observations less than number of parameters. If set to FALSE, those subjects will be excluded
 #' @param weight.func A string from c("standardize", "softmax"), a method to handle weights across multiple outcomes. Default is "standardize", but "softmax" is recommended for cases with a lot noise (indistinguishable) outcomes
