@@ -56,7 +56,9 @@ LongDataClusterW <- function(x, Y, id, functional = "bs", preprocess = TRUE, wei
   XX.wait = XX.remain = t(x.wait) %*% x.wait
   Xy.wait = Xy.remain = t(x.wait) %*% t(t(y.wait))
   Y2.wait = Y2.remain = colSums(y.wait^2)
-  SSR.all = Y2.wait - diag(t(Xy.wait) %*% ginv(XX.wait) %*% Xy.wait)
+  A.wait  = ginv(XX.wait)
+  e.beta  = A.wait %*% Xy.wait
+  SSR.all = Y2.wait - diag(t(Xy.wait) %*% e.beta)
   e.sigma = SSR.all/(nrow(x.wait) - p.var)
   
   ## Generate profile for each subject
@@ -239,16 +241,20 @@ LongDataClusterW <- function(x, Y, id, functional = "bs", preprocess = TRUE, wei
   
   
   
-  
-  ## Generate all inter-cluster distances
-  Dist.inter = NULL # inter-cluster (or so-called between cluster distance)
+  ## Generate all inter-cluster distances for Gap_b calculation
+  Dist.Gap = NULL # inter-cluster (or so-called between cluster distance)
+  Dist.inter = NULL # between cluster distance for CH
   for (i in seq(length(pure.leaf))) {
     xy.s = Xy.wait - pure.leaf[[i]]$Xy
     xx.s = XX.wait - pure.leaf[[i]]$XX
     SSR.s= Y2.wait - pure.leaf[[i]]$Y2 - diag(t(xy.s) %*% ginv(xx.s) %*% xy.s)
-    # Dist.inter = c(Dist.inter, sum((SSR.all - SSR.s - pure.leaf[[i]]$SSR0)/(SSR.s + pure.leaf[[i]]$SSR0)*(sum(obs.no) - 2*p.var)/p.var*weight))
-    Dist.inter = c(Dist.inter, sum((SSR.all - SSR.s - pure.leaf[[i]]$SSR0)*weight))
+    Dist.Gap = c(Dist.Gap, sum((SSR.all - SSR.s - pure.leaf[[i]]$SSR0)*weight))
+    # Dist.Gap = c(Dist.Gap, sum((SSR.all - SSR.s - pure.leaf[[i]]$SSR0)/(SSR.s + pure.leaf[[i]]$SSR0)*(sum(obs.no) - 2*p.var)/p.var*weight))
+    
+    e.beta.s = e.beta - ginv(pure.leaf[[i]]$XX) %*% pure.leaf[[i]]$Xy 
+    Dist.inter = c(Dist.inter, sum(t(e.beta.s) %*% pure.leaf[[i]]$XX %*% e.beta.s *weight))
   }
+  
   
   ##============= Based on pure.leaf and Dist.tab, start hierachical merging ==============##
   out.ID  = list(lapply(pure.leaf, function(x) x$id.in))
@@ -256,6 +262,7 @@ LongDataClusterW <- function(x, Y, id, functional = "bs", preprocess = TRUE, wei
   Name.L   = list(as.character(seq(length(pure.leaf))))
   Addres   = numeric(0)
   W.dist   = sum(colSums(do.call(rbind, lapply(pure.leaf, function(x) x$SSR0)))*weight)
+  Gap.dist = sum(Dist.Gap)
   
   while (TRUE) {
     ij = which(Dist.tab==min(Dist.tab), arr.ind = T)
@@ -298,9 +305,13 @@ LongDataClusterW <- function(x, Y, id, functional = "bs", preprocess = TRUE, wei
     xy.s = Xy.wait - leaf.merge$Xy
     xx.s = XX.wait - leaf.merge$XX
     SSR.s= Y2.wait - leaf.merge$Y2 - diag(t(xy.s) %*% ginv(xx.s) %*% xy.s)
-    Dist.inter = c(Dist.inter[-ij], sum(( SSR.all - SSR.s - leaf.merge$SSR0)*weight))
+    Dist.Gap = c(Dist.Gap[-ij], sum(( SSR.all - SSR.s - leaf.merge$SSR0)*weight))
+    
+    e.beta.s = e.beta - ginv(leaf.merge$XX) %*% leaf.merge$Xy 
+    Dist.inter = c(Dist.inter[-ij], sum(t(e.beta.s) %*% leaf.merge$XX %*% e.beta.s *weight))
     # Dist.inter = c(Dist.inter[-ij], sum(( SSR.all - SSR.s - leaf.merge$SSR0)/(SSR.s + leaf.merge$SSR0)*(sum(obs.no) - 2*p.var)/p.var*weight))
     B.dist  = c(sum(Dist.inter), B.dist)
+    Gap.dist = c(sum(Dist.Gap), Gap.dist)
     
     n.tmp = length(pure.leaf)
     # 2. Update distance matrix by removing ij, and add one row/column with distance between new subgroup to all rest subgroups
@@ -336,10 +347,12 @@ LongDataClusterW <- function(x, Y, id, functional = "bs", preprocess = TRUE, wei
               Dist.tab = Dist.tab,
               B.dist = B.dist,
               W.dist = W.dist,
+              Gap.dist = Gap.dist,
               obs.no = obs.no,
               weight = weight,
               Name.L = Name.L,
               Addres = Addres,
+              p.var  = p.var, 
               e.sigma= sum(weight*e.sigma)))
 }
 
