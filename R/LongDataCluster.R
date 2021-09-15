@@ -98,8 +98,8 @@ LongDataCluster <- function(x, Y, id,
   }
 
   p.var = dim(res$pure.leaf[[1]]$XX)[1]
-  # Gap_b     = res$B.dist - seq(1, length(res$B.dist))*p.var*res$e.sigma
-  Gap_b     = res$Gap.dist - seq(1, length(res$Gap.dist))*(length(x) - 2*p.var)/(length(x) - 2*p.var - 2) # when using Chow-test as distance
+  Gap_b     = res$B.dist - seq(1, length(res$B.dist))*p.var*res$e.sigma
+  # Gap_b     = res$Gap.dist - seq(1, length(res$Gap.dist))*(length(x) - 2*p.var)/(length(x) - 2*p.var - 2) # when using Chow-test as distance
   N.cluster = ifelse(sum(diff(Gap_b)<0)==0, 1, which(diff(Gap_b)<0)[1])
   CH.index  = res$B.dist/(seq(1,length(res$B.dist))-1)/res$W.dist*(sum(res$obs.no) - res$p.var*seq(1,length(res$B.dist))); CH.index[1] = 0
   return(list(Cluster.res = lapply(res$out.ID[[N.cluster]], sort),
