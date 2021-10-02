@@ -1,5 +1,11 @@
 # ClusterLong
-Support to clustering longitudinal data with sparse (very little observed points for each subject) and irregular (the observation occassions are not aligned across subjects) observations. Longitudinal data with multiple outcomes is supported as well, where some of them could be pure noise (non-distinguishable). Support the case with potentially unbalanced cluster size, i.e., the number of subjects in some clusters are way outnumbered by the others.
+Support to clustering longitudinal data with sparse (very little observed points for each subject) and irregular (the observation occassions are not aligned across subjects) observations. 
+
+Longitudinal data with multiple outcomes is supported as well, where some of them could be pure noise (non-distinguishable). 
+
+Support the case with potentially unbalanced cluster size, i.e., the number of subjects in some clusters are way outnumbered by the others.
+
+In sum, the package is capable of clustering **sparse, irregular, unbalanced, and multivariate continuous** longitudinal data  
 
 ## Installation
 To install the package: 
