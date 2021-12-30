@@ -1,4 +1,4 @@
-#' @title Ancillary function for parallel computing
+#' @title Ancillary function for parallel computing (not for call)
 #' @description Based on outputs from each server/slave, merge them and keep hierarchical algorithm until only one group left
 #' @param pure.leaf Output from LongDataCluster.core in each server
 #' @param stop When iteratively applying parallel idea, stop when a certain number of clusters are left

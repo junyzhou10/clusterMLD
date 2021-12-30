@@ -25,7 +25,7 @@ LongDataCluster(
 
 \item{id}{A vector with same length of x, represents the corresponding subject id of each observation}
 
-\item{DistMetric}{c("W", "UnW") for Weighted, and Unweighted distance metric. Default is Weighted.}
+\item{DistMetric}{c("W", "UnW") for Weighted or Unweighted distance metric. Default is Weighted.}
 
 \item{functional}{A string from c("bs", "ns"), indicating b-splines and natural splines}
 

@@ -2,7 +2,7 @@ VignetteBuilder: knitr
 Package: ClusterLong
 Type: Package
 Title: Cluster longitudinal data
-Version: 0.2.0
+Version: 0.2.1
 Author: Junyi Zhou
 Maintainer: Junyi Zhou <junyzhou@iu.edu>
 Description: This package is designed to cluster longitudinal data, especially for those data with sparse and irregular observations. 

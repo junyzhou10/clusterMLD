@@ -4,7 +4,7 @@
 \alias{FinalCluster}
 \title{Ancillary function for parallel computing}
 \usage{
-FinalCluster(pure.leaf, stop = 1, weight.func)
+FinalCluster(pure.leaf, stop = 1, weight.func, DistMetric)
 }
 \arguments{
 \item{pure.leaf}{Output from LongDataCluster.core in each server}
@@ -12,6 +12,8 @@ FinalCluster(pure.leaf, stop = 1, weight.func)
 \item{stop}{When iteratively applying parallel idea, stop when a certain number of clusters are left}
 
 \item{weight.func}{weight function}
+
+\item{DistMetric}{Weighted or Unweighted distance metric}
 }
 \value{
 The same output as LongDataCluster.core
