@@ -2,7 +2,7 @@
 % Please edit documentation in R/FinalCluster.R
 \name{FinalCluster}
 \alias{FinalCluster}
-\title{Ancillary function for parallel computing}
+\title{Ancillary function for parallel computing (not for call)}
 \usage{
 FinalCluster(pure.leaf, stop = 1, weight.func, DistMetric)
 }
