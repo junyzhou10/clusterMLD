@@ -1,10 +1,10 @@
 #' @title Plot estimated mean trajectories for each detected cluster
-#' @description Based on output from LongDataCluster, yield the corresponding mean curves
-#' @param Cluster.object The object return from function LongDataCluster
+#' @description Based on output from \code{LongDataCluster}, yield the corresponding mean curves
+#' @param Cluster.object The object return from function \code{LongDataCluster}
 #' @param No.Cluster User specified number of clusters
-#' @param CH If TRUE, use optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gap.b
-#' @param max.plots When there are multiple outcomes, the maximum number of figures to show. The outcomes with largest weights will be selected.
-#' @param rev.ord If TRUE, the outcomes with smallest weights will be displayed. Default is FALSE.
+#' @param CH If \code{TRUE}, use optimal number of clusters determined by CH index to cut dendrogram. The default is to use the \eqn{Gap_b} metric
+#' @param max.plots When there are multiple outcomes, the maximum number of figures to show. The outcomes with larger weights have higher priority.
+#' @param rev.ord If \code{TRUE}, the outcomes with smallest weights will be displayed. Default is \code{FALSE}.
 #' @return A figure yield by plotly, which mean trajectories in different colors.
 #' @import dplyr ggplot2
 #' @importFrom stats reshape

@@ -13,21 +13,21 @@ MeanPlot(
 )
 }
 \arguments{
-\item{Cluster.object}{The object return from function LongDataCluster}
+\item{Cluster.object}{The object return from function \code{LongDataCluster}}
 
 \item{No.Cluster}{User specified number of clusters}
 
-\item{CH}{If TRUE, use optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gap.b}
+\item{CH}{If \code{TRUE}, use optimal number of clusters determined by CH index to cut dendrogram. The default is to use the \eqn{Gap_b} metric}
 
-\item{max.plots}{When there are multiple outcomes, the maximum number of figures to show. The outcomes with largest weights will be selected.}
+\item{max.plots}{When there are multiple outcomes, the maximum number of figures to show. The outcomes with larger weights have higher priority.}
 
-\item{rev.ord}{If TRUE, the outcomes with smallest weights will be displayed. Default is FALSE.}
+\item{rev.ord}{If \code{TRUE}, the outcomes with smallest weights will be displayed. Default is \code{FALSE}.}
 }
 \value{
 A figure yield by plotly, which mean trajectories in different colors.
 }
 \description{
-Based on output from LongDataCluster, yield the corresponding mean curves
+Based on output from \code{LongDataCluster}, yield the corresponding mean curves
 }
 \examples{
 output = LongDataCluster(Longdat$Dat$obs,

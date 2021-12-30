@@ -43,7 +43,7 @@ LongDataCluster(
 }
 \value{
 A list object containing the hierarchical clustering results, and some ancillary outputs for parallel computing.
-\item{Cluster.res}{A list with length equal to the number of clusters determined by \eqn{Gap_b} index. Each list element consists of the corresponding subjects' id. In particular, it is equivalent to out.ID[[No.Gapb]]}
+\item{Cluster.res}{A list with length equal to the number of clusters determined by \eqn{Gap_b} index. Each list element consists of the corresponding subjects' id. In particular, it is equivalent to \code{out.ID[[No.Gapb]]}}
 \item{Cluster.Lists}{List of hierarchical results where the length should be the number of subjects when \code{parallel = FALSE}. This is the main output. The rest elements in returns are used to facilitate other functions}
 \item{No.Gapb}{Number of clusters determined by \eqn{Gap_b} statistic}
 \item{No.CH}{Number of clusters determined by CH index}
@@ -53,7 +53,7 @@ Clustering longitudinal data, expecially tailored for those observational longit
 }
 \details{
 For relatively large sample size, i.e. the number of subjects, not observations, we suggest to apply parallel computing to save time.
-By specifying \code{part.size} and \code{stop}, the algorithm actually split data into multiple random partitions with size roughly equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to stop.
+By specifying \code{part.size} and \code{stop}, the algorithm actually split data into multiple random partitions with size roughly equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to \code{stop}.
 Then combine the output clusters together. If the remaining number of clusters is still larger than part.size, multiple rounds of this process will be implemented.
 }
 \examples{

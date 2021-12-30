@@ -1,9 +1,9 @@
 #' @title Plot dendrogram
-#' @describeIn Based on output from LongDataCluster, yield the corresponding dendropgram
-#' @param Cluster.object The object return from function LongDataCluster
+#' @description Based on output from \code{LongDataCluster}, yield the corresponding dendropgram which demonstrates the merging process
+#' @param Cluster.object The object return from function \code{LongDataCluster}
 #' @param No.Cluster User specified number of clusters
-#' @param CH If TRUE, iuse optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gapb
-#' @param plain If TRUE, the dendrogram only, without coloring the clustering results
+#' @param CH If \code{TRUE}, use optimal number of clusters determined by CH index to cut dendrogram. The default is to use the \eqn{Gap_b} metric
+#' @param plain If \code{TRUE}, the dendrogram only, without color coding the clustering results
 #' @param ... Additional arguments for plot
 #' @examples
 #' output = LongDataCluster(Longdat$Dat$obs,

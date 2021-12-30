@@ -7,24 +7,19 @@
 DendroPlot(Cluster.object, No.Cluster = NULL, CH = FALSE, plain = FALSE, ...)
 }
 \arguments{
-\item{Cluster.object}{The object return from function LongDataCluster}
+\item{Cluster.object}{The object return from function \code{LongDataCluster}}
 
 \item{No.Cluster}{User specified number of clusters}
 
-\item{CH}{If TRUE, iuse optimal number of clusters determined by CH index to cut dendrogram. The default is to use Gapb}
+\item{CH}{If \code{TRUE}, use optimal number of clusters determined by CH index to cut dendrogram. The default is to use the \eqn{Gap_b} metric}
 
-\item{plain}{If TRUE, the dendrogram only, without coloring the clustering results}
+\item{plain}{If \code{TRUE}, the dendrogram only, without color coding the clustering results}
 
 \item{...}{Additional arguments for plot}
 }
 \description{
-Plot dendrogram
+Based on output from \code{LongDataCluster}, yield the corresponding dendropgram which demonstrates the merging process
 }
-\section{Functions}{
-\itemize{
-\item \code{DendroPlot}: on output from LongDataCluster, yield the corresponding dendropgram
-}}
-
 \examples{
 output = LongDataCluster(Longdat$Dat$obs,
 Longdat$Dat[,paste("y", seq(5), sep = "_")],
