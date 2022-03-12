@@ -26,4 +26,4 @@ The author created an R shiny app for a better illustration/visualization of the
 The App is published at https://junyzhou.shinyapps.io/ClusterLong_ShinyApp/, with two toy examples uploaded already. Please note that it will take more time to run parallel online than local.
 
 ## Limitations
-The current version mainly support for the continuous outcomes. Algorithm for other outcome types, such as binary and time-to-event, are now underdevelopment. 
+The current version mainly support for the continuous outcomes. Algorithm for other outcome types, such as binary and time-to-event, are now under development. 
