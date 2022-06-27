@@ -3,17 +3,30 @@
 #' @param x A vector in long format, occassions or time of observation times
 #' @param Y A matrix, if multiple outcomes exist; or a (column) vector, for single outcome case
 #' @param id A vector with same length of x, represents the corresponding subject id of each observation
-#' @param DistMetric \code{c("W", "UnW")} for Weighted or Unweighted distance metric. Default is Weighted.
+#' @param DistMetric \code{c("W", "UnW")} for Weighted or Unweighted distance metric. Default is \code{Weighted}. See details.
 #' @param functional A string from \code{c("bs", "ns")}, indicating b-splines or natural splines
-#' @param preprocess boolean, whether data pre-processing procedure should be applied. Default is \code{TRUE} to handle subjects with observations less than number of parameters. If set to \code{FALSE}, those subjects will be excluded
-#' @param weight.func A string from \code{c("standardize", "softmax")}, a method to handle weights across multiple outcomes. Default is \code{"standardize"}, but \code{"softmax"} is recommended for cases with a lot noise (indistinguishable) outcomes
-#' @param parallel If \code{TRUE}, use parallel foreach to cluster each ubgroup of original data. Must register parallel before hand, such as doMC or others
-#' @param stop An integer, only required in parallel computing. It indicates when to stop hierarchical clustering process in each slave/server. See details
+#' @param preprocess boolean, whether data pre-processing procedure should be applied. Default is \code{TRUE} to handle 
+#'                   subjects with observations less than number of parameters. If set to \code{FALSE}, those subjects will be excluded
+#' @param weight.func A string from \code{c("standardize", "softmax", "equal")}, a method to handle weights across multiple outcomes. 
+#'                    Default is \code{"standardize"}, but \code{"softmax"} is recommended for cases with a lot noise (indistinguishable) outcomes.
+#'                    Select \code{"equal"} then all outcomes are forced to be treated equally.
+#' @param parallel If \code{TRUE}, use parallel foreach to cluster each ubgroup of original data. 
+#'                 Must register parallel beforehand, such as doMC or others
+#' @param stop An integer, only required in parallel computing. It indicates when to stop hierarchical 
+#'             clustering process in each slave/server. See details
 #' @param part.size In parallel computing, the (rough) number of subjects in each random partitions. See more in details
 #' @param ... Additional arguments for the functional bases. The default is cubic B-spline with 3 interval knots
-#' @details For relatively large sample size, i.e. the number of subjects, not observations, we suggest to apply parallel computing to save time.
-#' By specifying \code{part.size} and \code{stop}, the algorithm actually split data into multiple random partitions with size roughly equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to \code{stop}.
-#' Then combine the output clusters together. If the remaining number of clusters is still larger than part.size, multiple rounds of this process will be implemented.
+#' @details There are two distance metrics available, one is so-called unweighted \code{UnW}, i.e. \cr
+#'          \eqn{Dist = SSR(both) - SSR(cluster 1) - SSR(cluster 2)}. 
+#'          \cr The other is weighted \code{W}, \cr
+#'          \eqn{Dist = {SSR(both) - SSR(cluster 1) - SSR(cluster 2)}/p / {(SSR(cluster 1) + SSR(cluster 2))/(n_1+n_2-p)}},
+#'          \cr where \eqn{p} is the number of basis function, and \eqn{n_1} and \eqn{n_2} are the sample size for cluster 1
+#'          and 2, respectively. Two metric can yield slightly different results. 
+#'          \cr
+#'          For relatively large sample size, in terms of the number of subjects not observations, we suggest to apply parallel computing to save time dramatically.
+#'          By specifying \code{part.size} and \code{stop}, the algorithm actually split data into multiple random partitions with size roughly 
+#'          equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to \code{stop}.
+#'          Then combine the output clusters together. If the remaining number of clusters is still larger than part.size, multiple rounds of this process will be implemented.
 #' @return A list object containing the hierarchical clustering results, and some ancillary outputs for parallel computing.
 #' \item{Cluster.res}{A list with length equal to the number of clusters determined by \eqn{Gap_b} index. Each list element consists of the corresponding subjects' id. In particular, it is equivalent to \code{out.ID[[No.Gapb]]}}
 #' \item{Cluster.Lists}{List of hierarchical results where the length should be the number of subjects when \code{parallel = FALSE}. This is the main output. The rest elements in returns are used to facilitate other functions}

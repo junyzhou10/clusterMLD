@@ -5,7 +5,9 @@
 #' @param id A vector with same length of x, represents the corresponding subject id of each observation
 #' @param functional A string from c("bs", "ns"), indicating b-splines and natural splines
 #' @param preprocess boolean, whether data pre-processing procedure should be applied. Default is TRUE to handle subjects with observations less than number of parameters. If set to FALSE, those subjects will be excluded.
-#' @param weight.func A string from c("standardize", "softmax"), a method to handle weights across multiple outcomes. Default is "standardize", but "softmax" is recommended for cases with a lot noise (indistinguishable) outcomes
+#' @param weight.func A string from \code{c("standardize", "softmax", "equal")}, a method to handle weights across multiple outcomes. 
+#'                    Default is \code{"standardize"}, but \code{"softmax"} is recommended for cases with a lot noise (indistinguishable) outcomes.
+#'                    Select \code{"equal"} then all outcomes are forced to be treated equally.
 #' @param parallel boolean, indicating whether parallel computing should be implemented. Default is FALSE
 #' @param stop An integer, only required in parallel computing. It indicates when to stop hierarchical clustering process in each slave/serve
 #' @param ... Additional arguments for the functional bases. The default is cubic B-spline with 3 interval knots
@@ -17,6 +19,8 @@ LongDataClusterW <- function(x, Y, id, functional = "bs", preprocess = TRUE, wei
     w.func <- function(w) {w/sum(w)}
   } else if (weight.func == "softmax") {
     w.func <- function(w) {w = scale(w); exp(w)/sum(exp(w))}
+  } else if (weight.func == "equal") {
+    w.func <- function(w) {rep(1/y.dim, y.dim)}
   } else {
     warning("weight.func is not correctly specified!")
     return(NULL)

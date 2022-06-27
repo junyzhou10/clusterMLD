@@ -25,17 +25,22 @@ LongDataCluster(
 
 \item{id}{A vector with same length of x, represents the corresponding subject id of each observation}
 
-\item{DistMetric}{\code{c("W", "UnW")} for Weighted or Unweighted distance metric. Default is Weighted.}
+\item{DistMetric}{\code{c("W", "UnW")} for Weighted or Unweighted distance metric. Default is \code{Weighted}. See details.}
 
 \item{functional}{A string from \code{c("bs", "ns")}, indicating b-splines or natural splines}
 
-\item{preprocess}{boolean, whether data pre-processing procedure should be applied. Default is \code{TRUE} to handle subjects with observations less than number of parameters. If set to \code{FALSE}, those subjects will be excluded}
+\item{preprocess}{boolean, whether data pre-processing procedure should be applied. Default is \code{TRUE} to handle 
+subjects with observations less than number of parameters. If set to \code{FALSE}, those subjects will be excluded}
 
-\item{weight.func}{A string from \code{c("standardize", "softmax")}, a method to handle weights across multiple outcomes. Default is \code{"standardize"}, but \code{"softmax"} is recommended for cases with a lot noise (indistinguishable) outcomes}
+\item{weight.func}{A string from \code{c("standardize", "softmax", "equal")}, a method to handle weights across multiple outcomes. 
+Default is \code{"standardize"}, but \code{"softmax"} is recommended for cases with a lot noise (indistinguishable) outcomes.
+Select \code{"equal"} then all outcomes are forced to be treated equally.}
 
-\item{parallel}{If \code{TRUE}, use parallel foreach to cluster each ubgroup of original data. Must register parallel before hand, such as doMC or others}
+\item{parallel}{If \code{TRUE}, use parallel foreach to cluster each ubgroup of original data. 
+Must register parallel beforehand, such as doMC or others}
 
-\item{stop}{An integer, only required in parallel computing. It indicates when to stop hierarchical clustering process in each slave/server. See details}
+\item{stop}{An integer, only required in parallel computing. It indicates when to stop hierarchical 
+clustering process in each slave/server. See details}
 
 \item{part.size}{In parallel computing, the (rough) number of subjects in each random partitions. See more in details}
 
@@ -52,9 +57,17 @@ A list object containing the hierarchical clustering results, and some ancillary
 Clustering longitudinal data, expecially tailored for those observational longitudinal data with sparse and irregular observations. The output could be a vector, i.e., at each occasion, more than one measure are observed for each subject
 }
 \details{
-For relatively large sample size, i.e. the number of subjects, not observations, we suggest to apply parallel computing to save time.
-By specifying \code{part.size} and \code{stop}, the algorithm actually split data into multiple random partitions with size roughly equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to \code{stop}.
-Then combine the output clusters together. If the remaining number of clusters is still larger than part.size, multiple rounds of this process will be implemented.
+There are two distance metrics available, one is so-called unweighted \code{UnW}, i.e. \cr
+         \eqn{Dist = SSR(both) - SSR(cluster 1) - SSR(cluster 2)}. 
+         \cr The other is weighted \code{W}, \cr
+         \eqn{Dist = {SSR(both) - SSR(cluster 1) - SSR(cluster 2)}/p / {(SSR(cluster 1) + SSR(cluster 2))/(n_1+n_2-p)}},
+         \cr where \eqn{p} is the number of basis function, and \eqn{n_1} and \eqn{n_2} are the sample size for cluster 1
+         and 2, respectively. Two metric can yield slightly different results. 
+         \cr
+         For relatively large sample size, in terms of the number of subjects not observations, we suggest to apply parallel computing to save time dramatically.
+         By specifying \code{part.size} and \code{stop}, the algorithm actually split data into multiple random partitions with size roughly 
+         equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to \code{stop}.
+         Then combine the output clusters together. If the remaining number of clusters is still larger than part.size, multiple rounds of this process will be implemented.
 }
 \examples{
 output = LongDataCluster(Longdat$Dat$obs,

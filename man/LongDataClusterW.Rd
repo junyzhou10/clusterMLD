@@ -27,7 +27,9 @@ LongDataClusterW(
 
 \item{preprocess}{boolean, whether data pre-processing procedure should be applied. Default is TRUE to handle subjects with observations less than number of parameters. If set to FALSE, those subjects will be excluded.}
 
-\item{weight.func}{A string from c("standardize", "softmax"), a method to handle weights across multiple outcomes. Default is "standardize", but "softmax" is recommended for cases with a lot noise (indistinguishable) outcomes}
+\item{weight.func}{A string from \code{c("standardize", "softmax", "equal")}, a method to handle weights across multiple outcomes. 
+Default is \code{"standardize"}, but \code{"softmax"} is recommended for cases with a lot noise (indistinguishable) outcomes.
+Select \code{"equal"} then all outcomes are forced to be treated equally.}
 
 \item{parallel}{boolean, indicating whether parallel computing should be implemented. Default is FALSE}
 
