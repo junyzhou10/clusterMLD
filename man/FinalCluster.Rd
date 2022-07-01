@@ -4,7 +4,7 @@
 \alias{FinalCluster}
 \title{Ancillary function for parallel computing (not for call)}
 \usage{
-FinalCluster(pure.leaf, stop = 1, weight.func, DistMetric)
+FinalCluster(pure.leaf, stop = 1, weight.func, DistMetric, y.dim)
 }
 \arguments{
 \item{pure.leaf}{Output from LongDataCluster.core in each server}
