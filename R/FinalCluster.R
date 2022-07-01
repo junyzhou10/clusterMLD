@@ -11,7 +11,9 @@ FinalCluster <- function(pure.leaf, stop = 1, weight.func, DistMetric) {
   if (weight.func == "standardize") {
     w.func <- function(w) {w/sum(w)}
   } else if (weight.func == "softmax") {
-    w.func <- function(w) {w = scale(w, center = F); exp(w)/sum(exp(w))}
+    w.func <- function(w) {w = scale(w); exp(w)/sum(exp(w))}
+  } else if (weight.func == "equal") {
+    w.func <- function(w) {rep(1/y.dim, y.dim)}
   } else {
     warning("weight.func is not correctly specified!")
     return(NULL)
