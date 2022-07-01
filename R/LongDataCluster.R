@@ -55,6 +55,7 @@ LongDataCluster <- function(x, Y, id,
                             weight.func = "standardize", 
                             parallel = FALSE, stop = 20, part.size = 300, ...){
   id.list = unique(id)
+  y.dim = ncol(data.matrix(Y))
   if (parallel) {
     splits = floor(length(unique(id))/part.size)
     # randomly split data into subgroups
@@ -80,11 +81,11 @@ LongDataCluster <- function(x, Y, id,
       splits = ceiling(len/part.size)
       id.split = sample(rep(seq(splits), length.out = len))
       pure.leaves = foreach(ii = seq(splits), .combine = c) %dopar% {
-        output = FinalCluster(pure.leaf = pure.leaves[id.split == ii], stop = stop, weight.func = weight.func, DistMetric = DistMetric)
+        output = FinalCluster(pure.leaf = pure.leaves[id.split == ii], stop = stop, weight.func = weight.func, DistMetric = DistMetric, y.dim = y.dim)
         return(output$pure.leaf)
       }
     }
-    res = FinalCluster(pure.leaf = pure.leaves, weight.func = weight.func, DistMetric = DistMetric) # stop = 1, combine to 1 group
+    res = FinalCluster(pure.leaf = pure.leaves, weight.func = weight.func, DistMetric = DistMetric, y.dim = y.dim) # stop = 1, combine to 1 group
   } else {
     if (DistMetric == "W") {
       res = LongDataClusterW(x=x, Y=Y, id=id, functional = functional, preprocess = preprocess, weight.func = weight.func, ...)

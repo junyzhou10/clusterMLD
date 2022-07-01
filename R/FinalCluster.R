@@ -6,7 +6,7 @@
 #' @param DistMetric Weighted or Unweighted distance metric
 #' @return The same output as LongDataCluster.core
 
-FinalCluster <- function(pure.leaf, stop = 1, weight.func, DistMetric) {
+FinalCluster <- function(pure.leaf, stop = 1, weight.func, DistMetric, y.dim) {
   # define weight function
   if (weight.func == "standardize") {
     w.func <- function(w) {w/sum(w)}
@@ -19,7 +19,7 @@ FinalCluster <- function(pure.leaf, stop = 1, weight.func, DistMetric) {
     return(NULL)
   }
 
-
+  
   XY   = Reduce("+", lapply(pure.leaf, function(x) x$Xy))
   XX   = Reduce("+", lapply(pure.leaf, function(x) x$XX))
   Y2   = Reduce("+", lapply(pure.leaf, function(x) x$Y2))
