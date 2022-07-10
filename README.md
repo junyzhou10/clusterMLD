@@ -10,7 +10,7 @@ In sum, the package is capable of clustering **sparse, irregular, unbalanced, an
 ## Installation
 To install the package: 
 ```r
-devtools::install_github("junyzhou10/ClusterLong")
+devtools::install_github("junyzhou10/clusterMLD")
 ```
 
 ## Usage
