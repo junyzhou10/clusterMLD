@@ -1,4 +1,5 @@
 #' @title Plot dendrogram
+#' @author Junyi Zhou \email{junyzhou@iu.edu}
 #' @description Based on output from \code{LongDataCluster}, yield the corresponding dendropgram which demonstrates the merging process
 #' @param Cluster.object The object return from function \code{LongDataCluster}
 #' @param No.Cluster User specified number of clusters
@@ -10,7 +11,7 @@
 #' Longdat$Dat[,paste("y", seq(5), sep = "_")],
 #' Longdat$Dat$id)
 #' DendroPlot(output)
-#'
+#' @seealso \code{\link{MeanPlot}}
 #' @export
 
 

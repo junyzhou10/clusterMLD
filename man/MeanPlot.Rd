@@ -34,5 +34,10 @@ output = LongDataCluster(Longdat$Dat$obs,
                          Longdat$Dat[,paste("y", seq(5), sep = "_")],
                          Longdat$Dat$id)
 MeanPlot(output)
-
+}
+\seealso{
+\code{\link{DendroPlot}}
+}
+\author{
+Junyi Zhou \email{junyzhou@iu.edu}
 }

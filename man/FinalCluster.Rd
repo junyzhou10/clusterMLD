@@ -21,3 +21,6 @@ The same output as LongDataCluster.core
 \description{
 Based on outputs from each server/slave, merge them and keep hierarchical algorithm until only one group left
 }
+\author{
+Junyi Zhou \email{junyzhou@iu.edu}
+}

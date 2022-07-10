@@ -1,4 +1,5 @@
 #' @title Plot estimated mean trajectories for each detected cluster
+#' @author Junyi Zhou \email{junyzhou@iu.edu}
 #' @description Based on output from \code{LongDataCluster}, yield the corresponding mean curves
 #' @param Cluster.object The object return from function \code{LongDataCluster}
 #' @param No.Cluster User specified number of clusters
@@ -14,7 +15,7 @@
 #'                          Longdat$Dat[,paste("y", seq(5), sep = "_")],
 #'                          Longdat$Dat$id)
 #' MeanPlot(output)
-#'
+#' @seealso \code{\link{DendroPlot}}
 #' @export
 
 

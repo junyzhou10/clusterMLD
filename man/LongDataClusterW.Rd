@@ -2,7 +2,7 @@
 % Please edit documentation in R/LongDataClusterW.R
 \name{LongDataClusterW}
 \alias{LongDataClusterW}
-\title{Clustering longitudinal data (not for call)}
+\title{Clustering longitudinal data (weighting-version, not for call)}
 \usage{
 LongDataClusterW(
   x,
@@ -42,4 +42,7 @@ A list object containing the hierarchical clustering results, and some ancillary
 }
 \description{
 Clustering longitudinal data, corresponding to weighted DistMetric argument,, expecially tailored for those observational longitudinal data with sparse and irregular observations. The output could be a vector, i.e., at each occasion, more than one measure are observed for each subject.
+}
+\author{
+Junyi Zhou \email{junyzhou@iu.edu}
 }

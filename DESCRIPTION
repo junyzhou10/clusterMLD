@@ -1,8 +1,8 @@
 VignetteBuilder: knitr
-Package: ClusterLong
+Package: clusterMLD
 Type: Package
-Title: Cluster longitudinal data
-Version: 0.2.1
+Title: Cluster Multivariate Longitudinal Data
+Version: 0.3.1
 Author: Junyi Zhou
 Maintainer: Junyi Zhou <junyzhou@iu.edu>
 Description: This package is designed to cluster longitudinal data, especially for those data with sparse and irregular observations. 
@@ -17,5 +17,5 @@ Suggests:
 Depends: 
      R (>= 3.6.0)
 RoxygenNote: 7.1.1
-URL: https://github.com/junyzhou10/ClusterLong
-BugReports: https://github.com/junyzhou10/ClusterLong/issues
+URL: https://github.com/junyzhou10/clusterMLD
+BugReports: https://github.com/junyzhou10/clusterMLD/issues

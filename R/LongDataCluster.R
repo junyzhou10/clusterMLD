@@ -1,4 +1,5 @@
-#' @title Clustering longitudinal data
+#' @title Clustering longitudinal data (Main Function)
+#' @author Junyi Zhou \email{junyzhou@iu.edu}
 #' @description Clustering longitudinal data, expecially tailored for those observational longitudinal data with sparse and irregular observations. The output could be a vector, i.e., at each occasion, more than one measure are observed for each subject
 #' @param x A vector in long format, occassions or time of observation times
 #' @param Y A matrix, if multiple outcomes exist; or a (column) vector, for single outcome case
@@ -46,7 +47,7 @@
 #' Longdat2$Dat$id, parallel = T, stop = 15, part.size = 200)
 #' }
 #' @export
-#'
+#' @seealso \code{\link{MeanPlot}}, \code{\link{DendroPlot}}
 
 LongDataCluster <- function(x, Y, id, 
                             DistMetric = "W",

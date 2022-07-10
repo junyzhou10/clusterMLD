@@ -2,7 +2,7 @@
 % Please edit documentation in R/LongDataCluster.R
 \name{LongDataCluster}
 \alias{LongDataCluster}
-\title{Clustering longitudinal data}
+\title{Clustering longitudinal data (Main Function)}
 \usage{
 LongDataCluster(
   x,
@@ -80,4 +80,10 @@ output = LongDataCluster(Longdat2$Dat$obs,
 Longdat2$Dat[,paste("y", seq(5), sep = "_")],
 Longdat2$Dat$id, parallel = T, stop = 15, part.size = 200)
 }
+}
+\seealso{
+\code{\link{MeanPlot}}, \code{\link{DendroPlot}}
+}
+\author{
+Junyi Zhou \email{junyzhou@iu.edu}
 }
