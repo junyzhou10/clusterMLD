@@ -63,7 +63,7 @@ There are two distance metrics available, one is so-called unweighted \code{UnW}
          \eqn{Dist = {SSR(both) - SSR(cluster 1) - SSR(cluster 2)}/p / {(SSR(cluster 1) + SSR(cluster 2))/(n_1+n_2-p)}},
          \cr where \eqn{p} is the number of basis function, and \eqn{n_1} and \eqn{n_2} are the sample size for cluster 1
          and 2, respectively. Two metric can yield slightly different results. 
-         \cr
+         \cr \cr
          For relatively large sample size, in terms of the number of subjects not observations, we suggest to apply parallel computing to save time dramatically.
          By specifying \code{part.size} and \code{stop}, the algorithm actually split data into multiple random partitions with size roughly 
          equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to \code{stop}.
@@ -85,5 +85,5 @@ Longdat2$Dat$id, parallel = T, stop = 15, part.size = 200)
 \code{\link{MeanPlot}}, \code{\link{DendroPlot}}
 }
 \author{
-Junyi Zhou \email{junyzhou@iu.edu}
+Junyi Zhou <\email{junyzhou@iu.edu}>
 }

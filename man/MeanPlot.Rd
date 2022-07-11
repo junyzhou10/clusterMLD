@@ -39,5 +39,5 @@ MeanPlot(output)
 \code{\link{DendroPlot}}
 }
 \author{
-Junyi Zhou \email{junyzhou@iu.edu}
+Junyi Zhou <\email{junyzhou@iu.edu}>
 }
