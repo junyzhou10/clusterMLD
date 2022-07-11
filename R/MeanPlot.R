@@ -1,5 +1,5 @@
 #' @title Plot estimated mean trajectories for each detected cluster
-#' @author Junyi Zhou \email{junyzhou@iu.edu}
+#' @author Junyi Zhou <\email{junyzhou@iu.edu}>
 #' @description Based on output from \code{LongDataCluster}, yield the corresponding mean curves
 #' @param Cluster.object The object return from function \code{LongDataCluster}
 #' @param No.Cluster User specified number of clusters

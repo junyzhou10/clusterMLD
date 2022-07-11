@@ -1,5 +1,5 @@
 #' @title Plot dendrogram
-#' @author Junyi Zhou \email{junyzhou@iu.edu}
+#' @author Junyi Zhou <\email{junyzhou@iu.edu}>
 #' @description Based on output from \code{LongDataCluster}, yield the corresponding dendropgram which demonstrates the merging process
 #' @param Cluster.object The object return from function \code{LongDataCluster}
 #' @param No.Cluster User specified number of clusters

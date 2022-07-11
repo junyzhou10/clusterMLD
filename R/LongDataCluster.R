@@ -1,5 +1,5 @@
 #' @title Clustering longitudinal data (Main Function)
-#' @author Junyi Zhou \email{junyzhou@iu.edu}
+#' @author Junyi Zhou <\email{junyzhou@iu.edu}>
 #' @description Clustering longitudinal data, expecially tailored for those observational longitudinal data with sparse and irregular observations. The output could be a vector, i.e., at each occasion, more than one measure are observed for each subject
 #' @param x A vector in long format, occassions or time of observation times
 #' @param Y A matrix, if multiple outcomes exist; or a (column) vector, for single outcome case
@@ -23,7 +23,7 @@
 #'          \eqn{Dist = {SSR(both) - SSR(cluster 1) - SSR(cluster 2)}/p / {(SSR(cluster 1) + SSR(cluster 2))/(n_1+n_2-p)}},
 #'          \cr where \eqn{p} is the number of basis function, and \eqn{n_1} and \eqn{n_2} are the sample size for cluster 1
 #'          and 2, respectively. Two metric can yield slightly different results. 
-#'          \cr
+#'          \cr \cr
 #'          For relatively large sample size, in terms of the number of subjects not observations, we suggest to apply parallel computing to save time dramatically.
 #'          By specifying \code{part.size} and \code{stop}, the algorithm actually split data into multiple random partitions with size roughly 
 #'          equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to \code{stop}.

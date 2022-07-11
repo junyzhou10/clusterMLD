@@ -1,5 +1,5 @@
 #' @title Clustering longitudinal data (no-weighting-versionnot for call)
-#' @author Junyi Zhou \email{junyzhou@iu.edu}
+#' @author Junyi Zhou <\email{junyzhou@iu.edu}>
 #' @description Clustering longitudinal data, corresponding to unweighted DistMetric argument, expecially tailored for those observational longitudinal data with sparse and irregular observations. The output could be a vector, i.e., at each occasion, more than one measure are observed for each subject.
 #' @param x A vector in long format, occassions or time of observation times.
 #' @param Y A matrix, if multiple outcomes exist; or a (column) vector, for single outcome case
