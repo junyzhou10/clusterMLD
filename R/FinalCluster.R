@@ -5,6 +5,7 @@
 #' @param stop When iteratively applying parallel idea, stop when a certain number of clusters are left
 #' @param weight.func weight function
 #' @param DistMetric Weighted or Unweighted distance metric
+#' @param y.dim Number of outcomes
 #' @return The same output as LongDataCluster.core
 
 FinalCluster <- function(pure.leaf, stop = 1, weight.func, DistMetric, y.dim) {

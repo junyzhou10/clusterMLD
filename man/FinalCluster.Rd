@@ -14,6 +14,8 @@ FinalCluster(pure.leaf, stop = 1, weight.func, DistMetric, y.dim)
 \item{weight.func}{weight function}
 
 \item{DistMetric}{Weighted or Unweighted distance metric}
+
+\item{y.dim}{Number of outcomes}
 }
 \value{
 The same output as LongDataCluster.core
