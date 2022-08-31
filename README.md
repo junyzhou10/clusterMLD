@@ -1,4 +1,4 @@
-# clusterMLD
+# clusterMLD: Clustering Multivariate Longitudinal Data
 Support to efficiently cluster multivariate longitudinal data with sparse (very little observed points for each subject) and irregular (the observation occassions are not aligned across subjects) observations. 
 
 Longitudinal data with multiple outcomes is supported as well, where some of them could be pure noise (non-distinguishable). 
