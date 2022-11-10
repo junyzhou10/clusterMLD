@@ -17,6 +17,6 @@ Suggests:
     rmarkdown
 Depends: 
      R (>= 3.6.0)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.1
 URL: https://github.com/junyzhou10/clusterMLD
 BugReports: https://github.com/junyzhou10/clusterMLD/issues

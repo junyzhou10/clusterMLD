@@ -81,7 +81,7 @@ MeanPlot <- function(Cluster.object, No.Cluster = NULL, CH = FALSE, max.plots = 
   p <- ggplot(highlight_key(fitted, key=~grp), aes(x, Y)) + geom_line(aes(color = grp)) +
     facet_wrap(~ylabel, nrow = Nrow) + theme_bw() +
     theme(legend.position = "none") +
-    labs(x = "Observations", y = "Outcomes")
+    labs(x = "Time", y = "Outcomes")
   gg <- highlight(ggplotly(p, tooltip = c("grp")), "plotly_hover", 'plotly_doubleclick')
   return(gg)
 }

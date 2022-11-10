@@ -12,6 +12,7 @@ LongDataCluster(
   functional = "bs",
   preprocess = TRUE,
   weight.func = "standardize",
+  No.Class = NULL,
   parallel = FALSE,
   stop = 20,
   part.size = 300,
@@ -36,6 +37,8 @@ subjects with observations less than number of parameters. If set to \code{FALSE
 Default is \code{"standardize"}, but \code{"softmax"} is recommended for cases with a lot noise (indistinguishable) outcomes.
 Select \code{"equal"} then all outcomes are forced to be treated equally.}
 
+\item{No.Class}{Optional, the number of clusters if user has a priori in mind. Default is \code{NULL}.}
+
 \item{parallel}{If \code{TRUE}, use parallel foreach to cluster each ubgroup of original data. 
 Must register parallel beforehand, such as doMC or others}
 
@@ -48,10 +51,13 @@ clustering process in each slave/server. See details}
 }
 \value{
 A list object containing the hierarchical clustering results, and some ancillary outputs for parallel computing.
-\item{Cluster.res}{A list with length equal to the number of clusters determined by \eqn{Gap_b} index. Each list element consists of the corresponding subjects' id. In particular, it is equivalent to \code{out.ID[[No.Gapb]]}}
-\item{Cluster.Lists}{List of hierarchical results where the length should be the number of subjects when \code{parallel = FALSE}. This is the main output. The rest elements in returns are used to facilitate other functions}
+\item{Cluster.res}{A list with length equal to the number of clusters determined by \eqn{Gap_b} index. Each list element consists of the corresponding subjects' id. 
+                   In particular, it is equivalent to \code{out.ID[[No.Gapb]]}}
+\item{Cluster.Lists}{List of hierarchical results where the length should be the number of subjects when \code{parallel = FALSE}. 
+                     This is the main output. The rest elements in returns are used to facilitate other functions}
 \item{No.Gapb}{Number of clusters determined by \eqn{Gap_b} statistic}
 \item{No.CH}{Number of clusters determined by CH index}
+\item{Dat.label}{Original dataset with labels and the number of cluster determined either by proposed \eqn{Gap_b} \code{}}
 }
 \description{
 Clustering longitudinal data, expecially tailored for those observational longitudinal data with sparse and irregular observations. The output could be a vector, i.e., at each occasion, more than one measure are observed for each subject
@@ -60,14 +66,15 @@ Clustering longitudinal data, expecially tailored for those observational longit
 There are two distance metrics available, one is so-called unweighted \code{UnW}, i.e. \cr
          \eqn{Dist = SSR(both) - SSR(cluster 1) - SSR(cluster 2)}. 
          \cr The other is weighted \code{W}, \cr
-         \eqn{Dist = {SSR(both) - SSR(cluster 1) - SSR(cluster 2)}/p / {(SSR(cluster 1) + SSR(cluster 2))/(n_1+n_2-p)}},
+         \eqn{ Dist = ({SSR(both) - SSR(cluster 1) - SSR(cluster 2)}/p) / ({(SSR(cluster 1) + SSR(cluster 2))/(n_1+n_2-p)}) },
          \cr where \eqn{p} is the number of basis function, and \eqn{n_1} and \eqn{n_2} are the sample size for cluster 1
          and 2, respectively. Two metric can yield slightly different results. 
          \cr \cr
          For relatively large sample size, in terms of the number of subjects not observations, we suggest to apply parallel computing to save time dramatically.
          By specifying \code{part.size} and \code{stop}, the algorithm actually split data into multiple random partitions with size roughly 
-         equal to part.size, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to \code{stop}.
+         equal to \code{part.size}, and then apply the hierarchical algorithm in a parallel fashion on each partition until the number of clusters goes down to \code{stop}.
          Then combine the output clusters together. If the remaining number of clusters is still larger than part.size, multiple rounds of this process will be implemented.
+         Otherwise, the last round will combine all the clusters until only one final node left.
 }
 \examples{
 output = LongDataCluster(Longdat$Dat$obs,
