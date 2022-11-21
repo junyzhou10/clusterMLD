@@ -48,8 +48,8 @@
 #' require(doMC)
 #' registerDoMC(cores = 6)
 #' output = LongDataCluster(Longdat2$Dat$obs,
-#' Longdat2$Dat[,paste("y", seq(5), sep = "_")],
-#' Longdat2$Dat$id, parallel = T, stop = 15, part.size = 200)
+#'          Longdat2$Dat[,paste("y", seq(5), sep = "_")],
+#'          sLongdat2$Dat$id, parallel = T, stop = 30, part.size = 300)
 #' }
 #' @export
 #' @seealso \code{\link{MeanPlot}}, \code{\link{DendroPlot}}
@@ -154,4 +154,10 @@ LongDataCluster <- function(x, Y, id,
                             stop       = stop,
                             part.size  = part.size)))
 }
+
+
+
+
+
+
 

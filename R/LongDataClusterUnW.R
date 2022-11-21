@@ -63,6 +63,7 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
   Y2.wait = Y2.remain = colSums(y.wait^2)
   A.wait  = ginv(XX.wait)
   e.beta  = A.wait %*% Xy.wait
+  # SSR.all = Y2.wait - sapply(seq(y.dim), function(k) t(Xy.wait[,k])%*%e.beta[,k])
   SSR.all = Y2.wait - diag(t(Xy.wait) %*% e.beta)
   e.sigma = SSR.all/(nrow(x.wait) - p.var)
 
@@ -76,8 +77,11 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
     A.mat   = ginv(XX)
     Xy      = t(x.in) %*% t(t(y.in))
     Y2      = colSums(y.in^2)
-    SSR0    = diag(Y2 - t(Xy) %*% A.mat %*% Xy)
-    SSR.r   = diag(Y2.wait - Y2 - t(Xy.wait-Xy) %*% solve(XX.wait - XX) %*% (Xy.wait-Xy))
+    # SSR0    = Y2 - sapply(seq(y.dim), function(k) t(Xy[,k])%*%A.mat%*%t(t(Xy[,k])))
+    SSR0    = Y2 - diag(t(Xy) %*% A.mat %*% Xy)
+    inv.tmp = solve(XX.wait - XX); d.Xy = Xy.wait-Xy
+    # SSR.r   = Y2.wait - Y2 - sapply(seq(y.dim), function(k) t(d.Xy[,k])%*%inv.tmp%*%d.Xy[,k])
+    SSR.r   = Y2.wait - Y2 - diag(t(d.Xy) %*% inv.tmp %*% d.Xy)
     SSR.dist= SSR.all - SSR0 - SSR.r
     leaf.new = list(id.in = id.list[i], A.mat = A.mat, XX = XX, Xy = Xy, Y2 = Y2, N.in = N.in, SSR0 = SSR0, SSR.dist = SSR.dist)
 
@@ -95,11 +99,11 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
         id.enough = id.list[which(obs.no > p.var)]
         x0  = x.bs[which(id.seq %in% id.enough), ]
         y0  = data.matrix(Y.dat[which(id.seq %in% id.enough),])
-        XX0 = t(x0) %*% x0
+        XX0 = t(x0) %*% x0; inv.tmp = ginv(XX0)
         Xy0 = t(x0) %*% t(t(y0))
         Y20 = colSums(y0^2)
+        # ssr0 = Y20 - sapply(seq(y.dim), function(k) t(Xy0[,k])%*%inv.tmp%*%Xy0[,k])
         ssr0 = Y20 - diag(t(Xy0) %*% ginv(XX0) %*% Xy0)
-
         weight = ssr0/(colSums(do.call(rbind, lapply(pure.leaf[which(obs.no > p.var)], function(x) x$SSR0))))-1;
         weight = w.func(weight)
       }
@@ -118,7 +122,8 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
             Xy.merge = pure.leaf[[i]]$Xy + pure.leaf[[j]]$Xy
             XX.merge = pure.leaf[[i]]$XX + pure.leaf[[j]]$XX
             A.merge  = ginv(XX.merge)
-            SSR.merge= diag(Y2.merge - t(Xy.merge) %*% A.merge %*% Xy.merge)
+            # SSR.merge= Y2.merge - sapply(seq(y.dim), function(k) t(Xy.merge[,k])%*%A.merge%*%Xy.merge[,k])
+            SSR.merge= Y2.merge - diag(t(Xy.merge) %*% A.merge %*% Xy.merge)
             Dist.tab[i,j] = sum(SSR.merge*weight)/N.in
           }
         }
@@ -146,7 +151,8 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
         Xy.merge = pure.leaf[[i]]$Xy + pure.leaf[[j]]$Xy
         XX.merge = pure.leaf[[i]]$XX + pure.leaf[[j]]$XX
         A.merge  = ginv(XX.merge)
-        SSR.merge= diag(Y2.merge - t(Xy.merge) %*% A.merge %*% Xy.merge)
+        # SSR.merge= Y2.merge - sapply(seq(y.dim), function(k) t(Xy.merge[,k])%*%A.merge%*%Xy.merge[,k])
+        SSR.merge= Y2.merge - diag(t(Xy.merge) %*% A.merge %*% Xy.merge)
         id.merge = c(pure.leaf[[i]]$id.in, pure.leaf[[j]]$id.in)
         N.merge  = pure.leaf[[i]]$N.in + pure.leaf[[j]]$N.in
         leaf.merge = list(id.in = id.merge,
@@ -163,11 +169,12 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
         id.enough    = unlist(lapply(pure.leaf[length.in > p.var], function(x) x$id.in))
         x0  = x.bs[which(id.seq %in% id.enough), ]
         y0  = data.matrix(Y.dat[which(id.seq %in% id.enough),])
-        XX0 = t(x0) %*% x0
+        XX0 = t(x0) %*% x0; inv.tmp = ginv(XX0)
         Xy0 = t(x0) %*% t(t(y0))
         Y20 = colSums(y0^2)
-        ssr0 = Y20 - diag(t(Xy0) %*% ginv(XX0) %*% Xy0)
-
+        # ssr0 = Y20 - sapply(seq(y.dim), function(k) t(Xy0[,k])%*%inv.tmp%*%Xy0[,k])
+        ssr0 = Y20 - diag(t(Xy0) %*% inv.tmp %*% Xy0)
+        
 
         # notice after the first merge, weight will be 0 if using previous calculation, so still treat it as equal weight
         if (length(pure.leaf) < (n.leaf-1) ) {
@@ -187,7 +194,8 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
           XX.merge = pure.leaf[[k]]$XX + leaf.merge$XX
           N.merge  = pure.leaf[[k]]$N.in + leaf.merge$N.in
           A.merge  = ginv(XX.merge)
-          SSR.merge= diag(Y2.merge - t(Xy.merge) %*% A.merge %*% Xy.merge)
+          # SSR.merge= Y2.merge - sapply(seq(y.dim), function(k) t(Xy.merge[,k])%*%A.merge%*%Xy.merge[,k])
+          SSR.merge= Y2.merge - diag(t(Xy.merge) %*% A.merge %*% Xy.merge)
           Dist.new = c(Dist.new, sum(weight*SSR.merge)/N.merge)
         }
         Dist.tab = cbind(Dist.tab, Dist.new)
@@ -207,7 +215,8 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
           XX.merge = pure.leaf[[i]]$XX + pure.leaf[[j]]$XX
           # A.merge  = pure.leaf[[i]]$A.mat - pure.leaf[[i]]$A.mat %*% ginv(pure.leaf[[i]]$A.mat + pure.leaf[[j]]$A.mat) %*% pure.leaf[[i]]$A.mat
           A.merge  = ginv(XX.merge)
-          SSR.merge= diag(Y2.merge - t(Xy.merge) %*% A.merge %*% Xy.merge)
+          # SSR.merge= Y2.merge - sapply(seq(y.dim), function(k) t(Xy.merge[,k])%*%A.merge%*%Xy.merge[,k])
+          SSR.merge= Y2.merge - diag(t(Xy.merge) %*% A.merge %*% Xy.merge)
           Dist.tab[i,j] = sum((SSR.merge - pure.leaf[[i]]$SSR0 - pure.leaf[[j]]$SSR0)*weight) # if knots changed during pure group generation, this should be SSR.merge/(df-dfi-dfj)
         }
       }
@@ -216,11 +225,12 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
     id.enough = id.list[which(obs.no > p.var)]
     x0  = x.bs[which(id.seq %in% id.enough), ]
     y0  = data.matrix(Y.dat[which(id.seq %in% id.enough),])
-    XX0 = t(x0) %*% x0
+    XX0 = t(x0) %*% x0; inv.tmp = ginv(XX0)
     Xy0 = t(x0) %*% t(t(y0))
     Y20 = colSums(y0^2)
-    ssr0 = Y20 - diag(t(Xy0) %*% ginv(XX0) %*% Xy0)
-
+    # ssr0 = Y20 - sapply(seq(y.dim), function(k) t(Xy0[,k])%*%inv.tmp%*%Xy0[,k])
+    ssr0 = Y20 - diag(t(Xy0) %*% inv.tmp %*% Xy0)
+    
     weight = ssr0/(colSums(do.call(rbind, lapply(pure.leaf[which(obs.no > p.var)], function(x) x$SSR0))))-1;
     weight = w.func(weight)
     pure.leaf = pure.leaf[which(obs.no > p.var)]
@@ -235,7 +245,8 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
         XX.merge = pure.leaf[[i]]$XX + pure.leaf[[j]]$XX
         # A.merge  = pure.leaf[[i]]$A.mat - pure.leaf[[i]]$A.mat %*% ginv(pure.leaf[[i]]$A.mat + pure.leaf[[j]]$A.mat) %*% pure.leaf[[i]]$A.mat
         A.merge  = ginv(XX.merge)
-        SSR.merge= diag(Y2.merge - t(Xy.merge) %*% A.merge %*% Xy.merge)
+        # SSR.merge= Y2.merge - sapply(seq(y.dim), function(k) t(Xy.merge[,k])%*%A.merge%*%Xy.merge[,k])
+        SSR.merge= Y2.merge - diag(t(Xy.merge) %*% A.merge %*% Xy.merge)
         Dist.tab[i,j] = sum((SSR.merge - pure.leaf[[i]]$SSR0 - pure.leaf[[j]]$SSR0)*weight) # if knots changed during pure group generation, this should be SSR.merge/(df-dfi-dfj)
       }
     }
@@ -249,8 +260,9 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
   Dist.inter = NULL # between cluster distance for CH
   for (i in seq(length(pure.leaf))) {
     xy.s = Xy.wait - pure.leaf[[i]]$Xy
-    xx.s = XX.wait - pure.leaf[[i]]$XX
-    SSR.s= Y2.wait - pure.leaf[[i]]$Y2 - diag(t(xy.s) %*% ginv(xx.s) %*% xy.s)
+    xx.s = XX.wait - pure.leaf[[i]]$XX; inv.tmp = ginv(xx.s)
+    # SSR.s= Y2.wait - pure.leaf[[i]]$Y2 - sapply(seq(y.dim), function(k) t(xy.s[,k])%*%inv.tmp%*%xy.s[,k])
+    SSR.s= Y2.wait - pure.leaf[[i]]$Y2 - diag(t(xy.s) %*% inv.tmp %*% xy.s)
     Dist.Gap = c(Dist.Gap, sum((SSR.all - SSR.s - pure.leaf[[i]]$SSR0)*weight))
     
     e.beta.s = e.beta - ginv(pure.leaf[[i]]$XX) %*% pure.leaf[[i]]$Xy 
@@ -277,7 +289,8 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
     XX.merge = pure.leaf[[i]]$XX + pure.leaf[[j]]$XX
     # A.merge  = pure.leaf[[i]]$A.mat - pure.leaf[[i]]$A.mat %*% ginv(pure.leaf[[i]]$A.mat + pure.leaf[[j]]$A.mat) %*% pure.leaf[[i]]$A.mat
     A.merge  = ginv(XX.merge)
-    SSR.merge= diag(Y2.merge - t(Xy.merge) %*% A.merge %*% Xy.merge)
+    # SSR.merge= Y2.merge - sapply(seq(y.dim), function(k) t(Xy.merge[,k])%*%A.merge%*%Xy.merge[,k])
+    SSR.merge= Y2.merge - diag(t(Xy.merge) %*% A.merge %*% Xy.merge)
     id.merge = c(pure.leaf[[i]]$id.in, pure.leaf[[j]]$id.in)
     N.merge  = pure.leaf[[i]]$N.in + pure.leaf[[j]]$N.in
     leaf.merge = list(id.in = id.merge,
@@ -305,8 +318,9 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
 
     # update Dist.inter
     xy.s = Xy.wait - leaf.merge$Xy
-    xx.s = XX.wait - leaf.merge$XX
-    SSR.s= Y2.wait - leaf.merge$Y2 - diag(t(xy.s) %*% ginv(xx.s) %*% xy.s)
+    xx.s = XX.wait - leaf.merge$XX; inv.tmp = ginv(xx.s)
+    # SSR.s= Y2.wait - leaf.merge$Y2 - sapply(seq(y.dim), function(k) t(xy.s[,k])%*%inv.tmp%*%xy.s[,k])
+    SSR.s= Y2.wait - leaf.merge$Y2 - diag(t(xy.s) %*% inv.tmp %*% xy.s)
     Dist.Gap = c(Dist.Gap[-ij], sum(( SSR.all - SSR.s - leaf.merge$SSR0)*weight))
     
     e.beta.s = e.beta - ginv(leaf.merge$XX) %*% leaf.merge$Xy 
@@ -329,7 +343,8 @@ LongDataClusterUnW <- function(x, Y, id, functional = "bs", preprocess = TRUE, w
         XX.merge = pure.leaf[[k]]$XX + leaf.merge$XX
         # A.merge  = pure.leaf[[k]]$A.mat - pure.leaf[[k]]$A.mat %*% ginv(pure.leaf[[k]]$A.mat + leaf.merge$A.mat) %*% pure.leaf[[k]]$A.mat
         A.merge  = ginv(XX.merge)
-        SSR.merge= diag(Y2.merge - t(Xy.merge) %*% A.merge %*% Xy.merge)
+        # SSR.merge= Y2.merge - sapply(seq(y.dim), function(k) t(Xy.merge[,k])%*%A.merge%*%Xy.merge[,k])
+        SSR.merge= Y2.merge - diag(t(Xy.merge) %*% A.merge %*% Xy.merge)
         Dist.new = c(Dist.new, sum(weight*(SSR.merge - pure.leaf[[k]]$SSR0 - leaf.merge$SSR0)))
       }
       Dist.tab = cbind(Dist.tab, Dist.new)
