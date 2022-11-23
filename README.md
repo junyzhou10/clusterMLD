@@ -30,4 +30,4 @@ The current version mainly support for the continuous outcomes. Algorithm for ot
 
 ## Reference
 
-[Junyi Zhou, Ying Zhang & Wanzhu Tu (2022) clusterMLD: An Efficient Hierarchical Clustering Method for Multivariate Longitudinal Data, Journal of Computational and Graphical Statistics, DOI: 10.1080/10618600.2022.2149540](https://www.tandfonline.com/doi/full/10.1080/10618600.2022.2149540)
+Junyi Zhou, Ying Zhang & Wanzhu Tu (2022) clusterMLD: An Efficient Hierarchical Clustering Method for Multivariate Longitudinal Data, Journal of Computational and Graphical Statistics, [DOI: 10.1080/10618600.2022.2149540](https://www.tandfonline.com/doi/full/10.1080/10618600.2022.2149540)
